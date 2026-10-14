@@ -1,5 +1,10 @@
 # PLAN – 2 timer, 5 personer
 
+> **Status 10:00:** skjelettet, `src/core/` (typer, profiler, generatorer, regler, tester), `store.ts`,
+> demodata og alle fire sider (oversikt, turnering, påmelding, admin) er laget og kjører
+> (`npm run dev`, `npm test` – 53 grønne). Resten av tiden går til å teste i nettleseren, finpusse
+> og lage presentasjonen. Se README.md for oppsett.
+
 Denne planen overstyrer SPEC.md når det gjelder omfang og teknologi. SPEC.md gjelder fortsatt
 for spillregler, begreper og design.
 
@@ -59,8 +64,8 @@ genererLiga(deltakerIds: string[], opts: { start: string; dagerMellomRunder: num
 genererSveitsiskRunde(snapshot: SveitsiskDeltaker[], runde: number): Kamp[]
 
 // Regler (P1)
-registrerResultat(kamp: Kamp, input: ResultatInput, profil: Spillprofil, alleKamper: Kamp[]): Kamp[] // returnerer endrede kamper (inkl. neste cupkamp)
-registrerWalkover(kamp: Kamp, moette: 'A' | 'B' | 'INGEN', profil: Spillprofil, alleKamper: Kamp[]): Kamp[]
+registrerResultat(kamp, input: ResultatInput, profil, alleKamper, opts: { kreverVinner: boolean; bestOf?: number }): Svar // { ok:true, kamper } med endrede kamper (inkl. neste cupkamp) eller { ok:false, feil }
+registrerWalkover(kamp, moette: 'A' | 'B' | 'INGEN', profil, alleKamper, opts: { bestOf?: number; erCup: boolean }): Svar
 beregnTabell(kamper: Kamp[], deltakere: Deltaker[], profil: Spillprofil, turnering: Turnering): Tabellrad[]
 kaarVinner(turnering: Turnering, kamper: Kamp[], tabell: Tabellrad[]): { vinner?: string; andre?: string; tredje?: string[] }
 beregnStatistikk(kamper: Kamp[], deltakere: Deltaker[], profil: Spillprofil): Statistikk

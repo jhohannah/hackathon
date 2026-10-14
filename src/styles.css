@@ -1,0 +1,974 @@
+:root {
+  --bg: #f5f6fa;
+  --kort: #ffffff;
+  --kant: #e4e6ee;
+  --tekst: #16182a;
+  --tekst2: #5d6275;
+  --primar: #5b3df5;
+  --primar-lys: #efecff;
+  --mork: #2a1b5c;
+  --gull: #f5b800;
+  --pagar-bg: #ffe8dc;
+  --pagar-tx: #a63d0a;
+  --apen-bg: #ddf6e8;
+  --apen-tx: #146c3e;
+  --grå-bg: #eef0f5;
+  --grå-tx: #3d4256;
+  --feil: #b3261e;
+  --radius: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+}
+body {
+  background: var(--bg);
+  color: var(--tekst);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+h1,
+h2,
+h3,
+.overskrift {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', sans-serif;
+  color: var(--mork);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+a {
+  color: var(--primar);
+  text-decoration: none;
+}
+button {
+  font: inherit;
+}
+
+/* ---------- layout ---------- */
+.topp {
+  background: var(--mork);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topp-inn {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.logo {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+.logo {
+  white-space: nowrap;
+}
+.logo svg {
+  color: var(--gull);
+  width: 28px;
+  height: 28px;
+  flex: none;
+}
+.kamp-rad.med-turnering {
+  grid-template-columns: 130px 1fr auto 1fr auto;
+}
+.nav {
+  display: flex;
+  gap: 4px;
+}
+.nav a {
+  color: #d8d0ff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.nav a.aktiv {
+  background: var(--primar);
+  color: #fff;
+}
+.side {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+.rad {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.mellomrom {
+  justify-content: space-between;
+}
+.stabel > * + * {
+  margin-top: 16px;
+}
+.liten {
+  font-size: 0.85rem;
+  color: var(--tekst2);
+}
+.sek {
+  color: var(--tekst2);
+}
+
+/* ---------- kort ---------- */
+.kort {
+  background: var(--kort);
+  border: 1px solid var(--kant);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.kort.ren {
+  padding: 0;
+  overflow: hidden;
+}
+.hero {
+  background: var(--mork);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 28px 26px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.hero h1,
+.hero h2 {
+  color: #fff;
+}
+.hero p {
+  margin: 6px 0 0;
+  color: #d8d0ff;
+}
+.rutenett {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+.turn-kort {
+  display: block;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.turn-kort:hover {
+  box-shadow: 0 6px 20px rgba(42, 27, 92, 0.12);
+  transform: translateY(-2px);
+}
+.turn-topp {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.ikon-boks {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--primar-lys);
+  color: var(--primar);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.ikon-boks svg {
+  width: 28px;
+  height: 28px;
+}
+.turn-tittel {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--mork);
+  line-height: 1.1;
+}
+.merker {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ---------- merker ---------- */
+.merke {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--grå-bg);
+  color: var(--grå-tx);
+  white-space: nowrap;
+}
+.merke.PAGAR,
+.merke.pagar {
+  background: var(--pagar-bg);
+  color: var(--pagar-tx);
+}
+.merke.PAMELDING_APEN,
+.merke.videre {
+  background: var(--apen-bg);
+  color: var(--apen-tx);
+}
+.merke.KOMMER,
+.merke.AVSLUTTET,
+.merke.ute,
+.merke.wo {
+  background: var(--grå-bg);
+  color: var(--grå-tx);
+}
+.merke.lilla {
+  background: var(--primar-lys);
+  color: var(--primar);
+}
+.merke.gull {
+  background: #fff3cc;
+  color: #7a5a00;
+}
+
+/* ---------- knapper og skjema ---------- */
+.knapp {
+  background: var(--primar);
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 42px;
+}
+.knapp:hover:not(:disabled) {
+  background: #4a2fd9;
+}
+.knapp:disabled {
+  background: #c9c3ee;
+  cursor: not-allowed;
+}
+.knapp.sek-knapp {
+  background: #fff;
+  color: var(--primar);
+  border: 1px solid var(--primar);
+}
+.knapp.sek-knapp:hover:not(:disabled) {
+  background: var(--primar-lys);
+}
+.knapp.liten-knapp {
+  padding: 6px 12px;
+  min-height: 34px;
+  font-size: 0.88rem;
+}
+.knapp.fare {
+  background: #fff;
+  color: var(--feil);
+  border: 1px solid var(--feil);
+}
+.knapp.lys {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+label.felt {
+  display: block;
+  margin-bottom: 14px;
+}
+label.felt > span.etikett {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+input[type='text'],
+input[type='number'],
+input[type='date'],
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--kant);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--tekst);
+  min-height: 42px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--primar);
+  outline-offset: 1px;
+}
+.feil {
+  color: var(--feil);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.feilboks {
+  background: #fdecea;
+  color: var(--feil);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.suksess {
+  background: var(--apen-bg);
+  color: var(--apen-tx);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+.valg-rad {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.chip {
+  border: 1px solid var(--kant);
+  background: #fff;
+  color: var(--tekst);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.chip.valgt {
+  background: var(--primar);
+  border-color: var(--primar);
+  color: #fff;
+}
+.chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.valgkort {
+  border: 2px solid var(--kant);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  width: 100%;
+  color: var(--tekst);
+}
+.valgkort.valgt {
+  border-color: var(--primar);
+  background: var(--primar-lys);
+}
+.valgkort:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.valgkort .tittel {
+  font-weight: 600;
+}
+.rutenett2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+/* ---------- faner ---------- */
+.faner {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--kant);
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+.fane {
+  background: none;
+  border: 0;
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--tekst2);
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+.fane.aktiv {
+  color: var(--primar);
+  border-bottom-color: var(--primar);
+}
+.runde-faner {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+
+/* ---------- tabell ---------- */
+.tabell-vrap {
+  overflow-x: auto;
+}
+table.tabell {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+table.tabell th,
+table.tabell td {
+  padding: 10px 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--kant);
+  white-space: nowrap;
+}
+table.tabell th {
+  color: var(--tekst2);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+table.tabell td.navn,
+table.tabell th.navn {
+  text-align: left;
+  font-weight: 600;
+}
+table.tabell td.plass {
+  color: var(--tekst2);
+  width: 36px;
+}
+table.tabell tr:last-child td {
+  border-bottom: 0;
+}
+table.tabell td.p {
+  font-weight: 700;
+  color: var(--mork);
+}
+table.tabell tr.leder td.plass {
+  color: var(--gull);
+  font-weight: 700;
+}
+.pos {
+  color: var(--apen-tx);
+}
+.neg {
+  color: var(--pagar-tx);
+}
+
+/* ---------- kamper ---------- */
+.kamp-rad {
+  display: grid;
+  grid-template-columns: 64px 1fr auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--kant);
+  background: #fff;
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  text-align: left;
+  color: var(--tekst);
+}
+button.kamp-rad {
+  cursor: pointer;
+}
+button.kamp-rad:hover {
+  background: #faf9ff;
+}
+.kamp-rad:last-child {
+  border-bottom: 0;
+}
+.kamp-rad .lag-a {
+  text-align: right;
+}
+.kamp-rad .lag-a,
+.kamp-rad .lag-b {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.kamp-rad .vant {
+  font-weight: 700;
+  color: var(--mork);
+}
+.kamp-rad .tapt {
+  color: var(--tekst2);
+}
+.kamp-rad .score {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  min-width: 70px;
+  text-align: center;
+  color: var(--mork);
+}
+.kamp-rad .tid {
+  font-size: 0.82rem;
+  color: var(--tekst2);
+}
+.smaa {
+  font-size: 0.72rem;
+  color: var(--tekst2);
+  font-weight: 400;
+}
+.endret {
+  animation: blink 2s ease-out;
+}
+@keyframes blink {
+  from {
+    background: #e7e1ff;
+  }
+  to {
+    background: transparent;
+  }
+}
+
+/* ---------- brakett ---------- */
+.brakett {
+  display: flex;
+  gap: 28px;
+  overflow-x: auto;
+  padding: 6px 2px 14px;
+}
+.brakett-kol {
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  flex: none;
+}
+.brakett-kol h4 {
+  margin: 0 0 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  color: var(--mork);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.brakett-kamper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 14px;
+  flex: 1;
+}
+.b-kamp {
+  background: #fff;
+  border: 1px solid var(--kant);
+  border-radius: 12px;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  color: var(--tekst);
+}
+button.b-kamp {
+  cursor: pointer;
+}
+button.b-kamp:hover {
+  border-color: var(--primar);
+}
+.b-lag {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 12px;
+  min-height: 38px;
+}
+.b-lag + .b-lag {
+  border-top: 1px solid var(--kant);
+}
+.b-lag.vant {
+  background: var(--primar-lys);
+  font-weight: 700;
+  color: var(--mork);
+}
+.b-lag.tapt {
+  opacity: 0.5;
+}
+.b-lag.tom {
+  color: var(--tekst2);
+  font-style: italic;
+}
+.b-info {
+  padding: 4px 12px 6px;
+  background: #fafbfd;
+  border-top: 1px solid var(--kant);
+  font-size: 0.72rem;
+  color: var(--tekst2);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------- vinner ---------- */
+.vinner-banner {
+  background: var(--mork);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.vinner-banner .troféi {
+  width: 74px;
+  height: 74px;
+  color: var(--gull);
+  flex: none;
+}
+.vinner-banner h2 {
+  color: #fff;
+  font-size: 2.2rem;
+}
+.vinner-banner .etikett {
+  color: var(--gull);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.pall {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin-left: auto;
+}
+.pall-s {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px 10px 0 0;
+  padding: 8px 12px;
+  min-width: 100px;
+  font-size: 0.85rem;
+}
+.pall-s .nr {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+.pall-s.n1 {
+  background: var(--gull);
+  color: #3a2a00;
+  padding-top: 16px;
+  padding-bottom: 14px;
+}
+.pall-s.n2 {
+  padding-top: 12px;
+}
+
+/* ---------- statistikk ---------- */
+.stat-rutenett {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--kant);
+  border-radius: 14px;
+  padding: 14px;
+}
+.stat .tall {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--mork);
+  line-height: 1.05;
+}
+.stat .navn {
+  color: var(--tekst2);
+  font-size: 0.85rem;
+}
+.form-chips {
+  display: inline-flex;
+  gap: 3px;
+}
+.fc {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+.fc.S {
+  background: #bfe9d0;
+  color: #0f5a33;
+}
+.fc.U {
+  background: #e4e6ee;
+  color: #3d4256;
+}
+.fc.T {
+  background: #ffd0c0;
+  color: #8a2e06;
+}
+
+/* ---------- sveitsisk ---------- */
+.rekord-gruppe {
+  border: 1px solid var(--kant);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+.rekord-hode {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #fafbfd;
+  border-bottom: 1px solid var(--kant);
+}
+.rekord-hode .overskrift {
+  font-size: 1.4rem;
+}
+.rekord-rad {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--kant);
+  gap: 8px;
+}
+.rekord-rad:last-child {
+  border-bottom: 0;
+}
+.rekord-rutenett {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+/* ---------- matrise ---------- */
+.matrise td,
+.matrise th {
+  min-width: 44px;
+}
+.matrise td.diag {
+  background: #f0f1f6;
+}
+.matrise .s {
+  color: var(--apen-tx);
+  font-weight: 700;
+}
+.matrise .t {
+  color: var(--pagar-tx);
+}
+
+/* ---------- modal ---------- */
+.bakteppe {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 24, 42, 0.5);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  padding: 12px;
+}
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 94vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+.modal-lag {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  margin: 10px 0 16px;
+  font-weight: 600;
+}
+.modal-lag .vs {
+  color: var(--tekst2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.2rem;
+}
+.tall-felt {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.tall-felt input {
+  text-align: center;
+  font-size: 1.6rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  min-height: 56px;
+}
+.store-knapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.store-knapper.fire {
+  grid-template-columns: repeat(2, 1fr);
+}
+.stor-knapp {
+  border: 2px solid var(--kant);
+  background: #fff;
+  border-radius: 14px;
+  min-height: 64px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--mork);
+  cursor: pointer;
+}
+.stor-knapp.valgt {
+  border-color: var(--primar);
+  background: var(--primar);
+  color: #fff;
+}
+.stor-knapp.mindre {
+  font-size: 1.1rem;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+}
+.skille {
+  border-top: 1px solid var(--kant);
+  margin: 16px 0;
+}
+
+/* ---------- diverse ---------- */
+.tom {
+  text-align: center;
+  color: var(--tekst2);
+  padding: 22px;
+}
+.seksjon-tittel {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 26px 0 10px;
+}
+.live-prikk {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e05a1a;
+  margin-right: 6px;
+  animation: puls 1.4s infinite;
+}
+@keyframes puls {
+  50% {
+    opacity: 0.25;
+  }
+}
+.filter-rad {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.filter-gruppe {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.filter-gruppe .etikett {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tekst2);
+  min-width: 56px;
+}
+.admin-rutenett {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.steg-nr {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--primar);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-right: 8px;
+}
+.liste-rad {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--kant);
+}
+.liste-rad:last-child {
+  border-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  .admin-rutenett {
+    grid-template-columns: 1fr;
+  }
+  .kamp-rad {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'tid status'
+      'a score'
+      'b score';
+    gap: 4px 10px;
+  }
+  .kamp-rad .tid {
+    grid-area: tid;
+  }
+  .kamp-rad .lag-a {
+    grid-area: a;
+    text-align: left;
+  }
+  .kamp-rad .lag-b {
+    grid-area: b;
+  }
+  .kamp-rad .score {
+    grid-area: score;
+    font-size: 1.6rem;
+  }
+  .kamp-rad .status {
+    grid-area: status;
+    justify-self: end;
+  }
+  .pall {
+    margin-left: 0;
+  }
+  .topp-inn {
+    gap: 8px;
+  }
+  .nav a {
+    padding: 7px 10px;
+  }
+}
