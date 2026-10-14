@@ -4,6 +4,7 @@ import { Ikon } from '../components/Ikoner'
 import { StatusMerke } from '../components/ui'
 import { DELTAKERTYPE_NAVN, TYPE_BESKRIVELSE, TYPE_NAVN, tallTekst } from '../core/format'
 import { kanVelgeDeltakertype } from '../core/kombinasjoner'
+import { foreslaaNavn } from '../core/navn'
 import { PROFILER, hentProfil } from '../core/profiler'
 import type { Deltakertype, Poeng, Status, Turnering, Turneringstype } from '../core/types'
 import { tilDatoInput } from '../lib/tid'
@@ -23,6 +24,7 @@ export function Admin() {
   const meldPa = useStore((s) => s.meldPa)
   const nullstill = useStore((s) => s.nullstill)
   const fjernDeltaker = useStore((s) => s.fjernDeltaker)
+  const flyttDeltaker = useStore((s) => s.flyttDeltaker)
 
   const [spillId, setSpillId] = useState<string | undefined>()
   const [type, setType] = useState<Turneringstype | undefined>()
@@ -35,7 +37,8 @@ export function Admin() {
   const [intervall, setIntervall] = useState('7')
   const [bestOf, setBestOf] = useState('3')
   const [lagStr, setLagStr] = useState('7')
-  const [seeding, setSeeding] = useState<'RATING' | 'TILFELDIG'>('RATING')
+  const [seeding, setSeeding] = useState<'RATING' | 'TILFELDIG' | 'MANUELL'>('RATING')
+  const [forslag, setForslag] = useState<string[]>([])
   const [modus, setModus] = useState<'RUNDER' | 'GRENSE'>('GRENSE')
   const [antallRunder, setAntallRunder] = useState('5')
   const [videre, setVidere] = useState('3')
@@ -209,10 +212,29 @@ export function Admin() {
                 <span className="steg-nr">4</span>Innstillinger
               </h3>
               {feil && <div className="feilboks" style={{ marginTop: 8 }}>{feil}</div>}
-              <label className="felt" style={{ marginTop: 10 }}>
+              <label className="felt" style={{ marginTop: 10, marginBottom: 6 }}>
                 <span className="etikett">Navn</span>
                 <input type="text" value={navn} onChange={(e) => setNavn(e.target.value)} placeholder="F.eks. Nome Høstcup" />
               </label>
+              <button
+                type="button"
+                className="knapp sek-knapp liten-knapp"
+                onClick={() =>
+                  setForslag(foreslaaNavn({ profil, type, dato: new Date(`${start}T12:00:00`), antall: 5 }))
+                }
+              >
+                {forslag.length ? 'Flere forslag' : 'Foreslå navn'}
+              </button>
+              {forslag.length > 0 && (
+                <div className="forslag" aria-label="Navneforslag">
+                  {forslag.map((f) => (
+                    <button type="button" key={f} className={`chip ${navn === f ? 'valgt' : ''}`} onClick={() => setNavn(f)}>
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div style={{ height: 8 }} />
               <div className="rutenett2">
                 <label className="felt">
                   <span className="etikett">Maks deltakere</span>
@@ -255,8 +277,9 @@ export function Admin() {
                 {type === 'CUP' && (
                   <label className="felt">
                     <span className="etikett">Seeding</span>
-                    <select value={seeding} onChange={(e) => setSeeding(e.target.value as 'RATING' | 'TILFELDIG')}>
+                    <select value={seeding} onChange={(e) => setSeeding(e.target.value as 'RATING' | 'TILFELDIG' | 'MANUELL')}>
                       <option value="RATING">Etter rating</option>
+                      <option value="MANUELL">Manuelt (jeg velger rekkefølgen)</option>
                       <option value="TILFELDIG">Tilfeldig</option>
                     </select>
                   </label>
@@ -264,7 +287,7 @@ export function Admin() {
               </div>
 
               {type === 'SVEITSISK' && (
-                <div className="kort" style={{ background: '#fafbfd', marginBottom: 14 }}>
+                <div className="kort" style={{ background: 'var(--kort2)', marginBottom: 14 }}>
                   <div className="valg-rad" style={{ marginBottom: 10 }}>
                     <button className={`chip ${modus === 'GRENSE' ? 'valgt' : ''}`} onClick={() => setModus('GRENSE')}>
                       Swiss stage (3 seire / 3 tap)
@@ -392,11 +415,34 @@ export function Admin() {
                 <div>
                   <h3>Deltakere ({valgtDeltakere.length}/{valgt.maksDeltakere})</h3>
                   {valgtDeltakere.length === 0 && <div className="liten">Ingen påmeldt ennå.</div>}
-                  {valgtDeltakere.map((d) => (
+                  {valgt.type === 'CUP' && valgtKamper.length === 0 && valgtDeltakere.length > 1 && (
+                    <div className="liten" style={{ marginBottom: 6 }}>
+                      Seeding: {valgt.seeding === 'MANUELL' ? 'manuell – bruk pilene (1 = best)' : valgt.seeding === 'TILFELDIG' ? 'tilfeldig' : 'etter rating'}.
+                      De to beste seedene havner i hver sin halvdel og kan møtes i finalen.
+                    </div>
+                  )}
+                  {(valgt.type === 'CUP' && valgt.seeding !== 'MANUELL' && valgt.seeding !== 'TILFELDIG'
+                    ? [...valgtDeltakere].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+                    : valgtDeltakere
+                  ).map((d, i) => (
                     <div className="liste-rad" key={d.id}>
-                      <span>{d.visningsnavn}</span>
+                      <span className="seed-rad">
+                        {valgt.type === 'CUP' && valgt.seeding !== 'TILFELDIG' && valgtKamper.length === 0 && (
+                          <span className="seed">{i + 1}</span>
+                        )}
+                        {d.visningsnavn}
+                        {d.rating ? <span className="liten">({d.rating})</span> : null}
+                      </span>
                       {valgtKamper.length === 0 && (
-                        <button className="knapp fare liten-knapp" onClick={() => fjernDeltaker(d.id)}>Fjern</button>
+                        <span className="rad" style={{ gap: 6 }}>
+                          {valgt.type === 'CUP' && valgt.seeding === 'MANUELL' && (
+                            <>
+                              <button className="knapp sek-knapp liten-knapp" aria-label="Flytt opp" disabled={i === 0} onClick={() => flyttDeltaker(d.id, -1)}>↑</button>
+                              <button className="knapp sek-knapp liten-knapp" aria-label="Flytt ned" disabled={i === valgtDeltakere.length - 1} onClick={() => flyttDeltaker(d.id, 1)}>↓</button>
+                            </>
+                          )}
+                          <button className="knapp fare liten-knapp" onClick={() => fjernDeltaker(d.id)}>Fjern</button>
+                        </span>
                       )}
                     </div>
                   ))}

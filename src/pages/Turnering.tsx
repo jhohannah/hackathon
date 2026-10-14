@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Brakett } from '../components/Brakett'
 import { Ikon } from '../components/Ikoner'
@@ -14,6 +14,7 @@ import { DELTAKERTYPE_NAVN, TYPE_NAVN } from '../core/format'
 import { erFerdig } from '../core/regler/status'
 import type { Kamp } from '../core/types'
 import { useTurnering } from '../lib/hooks'
+import { eksporterSomBilde } from '../lib/eksport'
 import { klokkeslett } from '../lib/tid'
 import { useStore } from '../store'
 
@@ -28,6 +29,8 @@ export function TurneringSide() {
   const [fane, setFane] = useState<Fane>('oversikt')
   const [valgtKamp, setValgtKamp] = useState<Kamp | undefined>()
   const [melding, setMelding] = useState<string | undefined>()
+  const [eksporterer, setEksporterer] = useState(false)
+  const eksportRef = useRef<HTMLDivElement>(null)
 
   if (!data) {
     return (
@@ -59,6 +62,18 @@ export function TurneringSide() {
             ? [{ id: 'oversikt', navn: 'Rekord' }, { id: 'tabell', navn: 'Tabell' }, { id: 'kamper', navn: 'Kamper' }, { id: 'statistikk', navn: 'Statistikk' }]
             : [{ id: 'oversikt', navn: 'Tabell' }, { id: 'kamper', navn: 'Kamper' }, { id: 'statistikk', navn: 'Statistikk' }]
 
+  const eksporter = async () => {
+    if (!eksportRef.current) return
+    setEksporterer(true)
+    try {
+      await eksporterSomBilde(eksportRef.current, t.navn)
+    } catch {
+      setMelding('Kunne ikke lage bildet. Prøv igjen.')
+    } finally {
+      setEksporterer(false)
+    }
+  }
+
   const kjor = (fn: () => { ok: boolean; feil?: string }) => {
     const r = fn()
     setMelding(r.ok ? undefined : r.feil)
@@ -66,6 +81,11 @@ export function TurneringSide() {
 
   return (
     <div className="stabel">
+      <div ref={eksportRef} className="stabel">
+      <div className="eksport-merke">
+        <span>Nome Games AS</span>
+        <span>{new Date().toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+      </div>
       <div className="rad mellomrom">
         <div className="rad">
           <div className="ikon-boks">
@@ -83,18 +103,25 @@ export function TurneringSide() {
             </div>
           </div>
         </div>
-        <div className="liten" title="Oppdateres automatisk">
-          <span className="live-prikk" style={{ background: 'var(--primar)' }} />
-          Sist oppdatert {klokkeslett(new Date(sistOppdatert).toISOString())}
+        <div className="rad skjul-ved-eksport">
+          <div className="liten" title="Oppdateres automatisk">
+            <span className="live-prikk" style={{ background: 'var(--primar)' }} />
+            Sist oppdatert {klokkeslett(new Date(sistOppdatert).toISOString())}
+          </div>
+          {harOppsett && (
+            <button className="knapp sek-knapp liten-knapp" onClick={eksporter} disabled={eksporterer}>
+              {eksporterer ? 'Lager bilde …' : 'Last ned som bilde'}
+            </button>
+          )}
         </div>
       </div>
 
       <VinnerBanner data={data} />
 
-      {melding && <div className="feilboks" role="alert">{melding}</div>}
+      {melding && <div className="feilboks skjul-ved-eksport" role="alert">{melding}</div>}
 
       {!harOppsett && (
-        <div className="kort">
+        <div className="kort skjul-ved-eksport">
           <div className="rad mellomrom">
             <div>
               <h3>Ingen kampoppsett ennå</h3>
@@ -117,7 +144,7 @@ export function TurneringSide() {
       )}
 
       {kanNeste && (
-        <div className="kort">
+        <div className="kort skjul-ved-eksport">
           <div className="rad mellomrom">
             <div>
               <h3>Runden er ferdig</h3>
@@ -130,14 +157,16 @@ export function TurneringSide() {
         </div>
       )}
       {swiss && harOppsett && !alleFerdige && !ferdig && (
-        <div className="liten">
+        <div className="liten skjul-ved-eksport">
           {uferdige} kamp{uferdige === 1 ? '' : 'er'} gjenstår i runden før neste runde kan genereres.
         </div>
       )}
 
       {harOppsett && (
         <>
-          <Faner faner={synligeFaner} valgt={fane} onVelg={setFane} />
+          <div className="skjul-ved-eksport">
+            <Faner faner={synligeFaner} valgt={fane} onVelg={setFane} />
+          </div>
 
           {fane === 'oversikt' && (
             <>
@@ -160,6 +189,7 @@ export function TurneringSide() {
           <Runder data={data} onVelg={setValgtKamp} />
         </>
       )}
+      </div>
 
       {aktivKamp && <ResultatSkjema key={aktivKamp.id} kamp={aktivKamp} data={data} onLukk={() => setValgtKamp(undefined)} />}
     </div>

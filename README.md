@@ -34,6 +34,15 @@ Tre uavhengige dimensjoner kan kombineres fritt: **spill** (profil), **turnering
 **deltakertype** (lag / 1 mot 1). Turneringslogikken forgrener seg aldri på spill-id; alt
 spillspesifikt kommer fra profilen.
 
+## Funksjoner i tillegg
+
+- **Seeding** (cup): rating, tilfeldig eller manuell rekkefølge. De to beste seedene havner i hver sin halvdel, så de kan møtes først i finalen.
+- **VM-brakett**: to halvdeler som møtes i finalen i midten, med koblingslinjer.
+- **Eksporter som bilde**: «Last ned som bilde» på turneringssiden lager en PNG.
+- **Dramatisk modus**: knapp i toppen, gjør all tekst til STORE BOKSTAVER.
+- **Navneforslag**: «Foreslå navn» i Admin.
+- **Walkover**: lag som ikke møter opp taper, og det andre laget får seieren og full poengsum.
+
 ## Legge til et nytt spill
 
 Legg til et objekt i `src/core/profiler.ts` og ta det med i `PROFILER`. Poeng, tiebreakers,

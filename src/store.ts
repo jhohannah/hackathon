@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { hentProfil } from './core/profiler'
-import { genererCup } from './core/generatorer/cup'
+import { genererCup, seedDeltakere } from './core/generatorer/cup'
 import { genererLiga, genererRoundRobin } from './core/generatorer/rundeturnering'
 import { registrerResultat, registrerWalkover } from './core/regler/resultat'
 import { genererNesteRunde } from './core/regler/sveitsisk'
@@ -35,6 +35,8 @@ interface State {
   settStatus: (turneringId: string, status: Status) => void
   meldPa: (turneringId: string, input: PameldingInput) => { ok: true } | { ok: false; feil: PameldingFeil }
   fjernDeltaker: (deltakerId: string) => void
+  /** Flytter en deltaker opp (-1) eller ned (+1) i seedingrekkefølgen (manuell seeding). */
+  flyttDeltaker: (deltakerId: string, retning: -1 | 1) => void
   genererOppsett: (turneringId: string) => Resultat
   nesteRunde: (turneringId: string) => Resultat
   lagreResultat: (kampId: string, input: ResultatInput) => Resultat
@@ -120,6 +122,20 @@ export const useStore = create<State>()(
           sistOppdatert: Date.now(),
         })),
 
+      flyttDeltaker: (deltakerId, retning) =>
+        set((s) => {
+          const d = s.deltakere.find((x) => x.id === deltakerId)
+          if (!d) return s
+          const alle = s.deltakere.filter((x) => x.turneringId === d.turneringId)
+          const i = alle.findIndex((x) => x.id === deltakerId)
+          const j = i + retning
+          if (j < 0 || j >= alle.length) return s
+          const ny = [...alle]
+          ;[ny[i], ny[j]] = [ny[j], ny[i]]
+          const andre = s.deltakere.filter((x) => x.turneringId !== d.turneringId)
+          return { deltakere: [...andre, ...ny], sistOppdatert: Date.now() }
+        }),
+
       genererOppsett: (turneringId) => {
         const s = get()
         const t = s.turneringer.find((x) => x.id === turneringId)
@@ -132,12 +148,20 @@ export const useStore = create<State>()(
         const ids = d.map((x) => x.id)
         const start = t.startdato
         let nye: Kamp[]
+        let deltakere = s.deltakere
         if (t.type === 'CUP') {
+          // Manuell seeding følger rekkefølgen i listen; rating følger rating; ellers tilfeldig.
           const rating =
-            t.seeding === 'RATING'
-              ? Object.fromEntries(d.map((x) => [x.id, x.rating ?? 0]))
-              : undefined
+            t.seeding === 'MANUELL'
+              ? Object.fromEntries(d.map((x, i) => [x.id, d.length - i]))
+              : t.seeding === 'TILFELDIG'
+                ? undefined
+                : Object.fromEntries(d.map((x) => [x.id, x.rating ?? 0]))
           nye = genererCup(ids, { turneringId: t.id, start, rating, seed: 7 })
+          const seedet = seedDeltakere(ids, { seed: 7, rating })
+          deltakere = s.deltakere.map((x) =>
+            x.turneringId === t.id ? { ...x, seed: seedet.indexOf(x.id) + 1 } : x,
+          )
         } else if (t.type === 'LIGA') {
           nye = genererLiga(ids, { turneringId: t.id, start, dagerMellomRunder: t.rundeintervall ?? 7 })
         } else if (t.type === 'ALLE_MOT_ALLE') {
@@ -150,8 +174,9 @@ export const useStore = create<State>()(
         const kamper = [...s.kamper, ...nye]
         set({
           kamper,
+          deltakere,
           turneringer: s.turneringer.map((x) =>
-            x.id === t.id ? { ...medStatus(x, kamper, s.deltakere), status: 'PAGAR' } : x,
+            x.id === t.id ? { ...medStatus(x, kamper, deltakere), status: 'PAGAR' } : x,
           ),
           sistOppdatert: Date.now(),
         })
@@ -231,7 +256,7 @@ export const useStore = create<State>()(
     }),
     {
       name: STORAGE_NOKKEL,
-      version: 1,
+      version: 2,
       partialize: (s) => ({
         turneringer: s.turneringer,
         deltakere: s.deltakere,

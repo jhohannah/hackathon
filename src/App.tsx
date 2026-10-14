@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { HashRouter, NavLink, Route, Routes, useParams } from 'react-router-dom'
 import { Trofe } from './components/Ikoner'
+import { useUi } from './lib/ui'
 import { Admin } from './pages/Admin'
 import { Oversikt } from './pages/Oversikt'
 import { Pamelding } from './pages/Pamelding'
@@ -11,6 +13,11 @@ function TurneringMedNokkel() {
 }
 
 export default function App() {
+  const dramatisk = useUi((u) => u.dramatisk)
+  const settDramatisk = useUi((u) => u.settDramatisk)
+  useEffect(() => {
+    document.documentElement.dataset.dramatisk = dramatisk ? '1' : '0'
+  }, [dramatisk])
   const lenke = ({ isActive }: { isActive: boolean }) => (isActive ? 'aktiv' : undefined)
   return (
     <HashRouter>
@@ -31,6 +38,14 @@ export default function App() {
               Admin
             </NavLink>
           </nav>
+          <button
+            className="dram-knapp"
+            aria-pressed={dramatisk}
+            onClick={() => settDramatisk(!dramatisk)}
+            title="Dramatisk modus: mørkt tema og alt i store bokstaver"
+          >
+            Dramatisk modus
+          </button>
         </div>
       </header>
       <main className="side">
