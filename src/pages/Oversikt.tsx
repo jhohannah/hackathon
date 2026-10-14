@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Ikon } from '../components/Ikoner'
+import { SpillSok } from '../components/SpillSok'
 import { KampRad } from '../components/KampRad'
 import { StatusMerke } from '../components/ui'
 import { DELTAKERTYPE_NAVN, TYPE_NAVN } from '../core/format'
-import { PROFILER, profilFor } from '../core/profiler'
+import { profilFor } from '../core/profiler'
+import { oppforingNokkel, spillNokkel, type SpillOppforing } from '../core/spillkatalog'
 import { beregnTabell } from '../core/regler/tabell'
 import { kaarVinner } from '../core/regler/vinner'
 import type { Status, Turnering, Turneringstype } from '../core/types'
@@ -25,13 +27,13 @@ export function Oversikt() {
   const deltakere = useStore((s) => s.deltakere)
   const kamper = useStore((s) => s.kamper)
   const navigate = useNavigate()
-  const [spill, setSpill] = useState<string | undefined>()
+  const [spill, setSpill] = useState<SpillOppforing | undefined>()
   const [type, setType] = useState<Turneringstype | undefined>()
   const [status, setStatus] = useState<Status | undefined>()
   const [visFerdige, setVisFerdige] = useState(false)
 
   const filtrert = turneringer.filter(
-    (t) => (!spill || t.spillprofilId === spill) && (!type || t.type === type) && (!status || t.status === status),
+    (t) => (!spill || spillNokkel(t) === oppforingNokkel(spill)) && (!type || t.type === type) && (!status || t.status === status),
   )
   const turnMap = useMemo(() => new Map(turneringer.map((t) => [t.id, t])), [turneringer])
   const deltakerNavn = useMemo(() => new Map(deltakere.map((d) => [d.id, d.visningsnavn])), [deltakere])
@@ -68,14 +70,18 @@ export function Oversikt() {
       </div>
 
       <div className="filter-rad">
-        <div className="filter-gruppe">
+        <div className="filter-gruppe filter-sok">
           <span className="etikett">{tr('Spill')}</span>
-          <button className={`chip ${!spill ? 'valgt' : ''}`} onClick={() => setSpill(undefined)}>{tr('Alle')}</button>
-          {PROFILER.map((p) => (
-            <button key={p.id} className={`chip ${spill === p.id ? 'valgt' : ''}`} onClick={() => setSpill(p.id)}>
-              {tr(p.navn)}
-            </button>
-          ))}
+          <SpillSok
+            valgt={spill ? tr(spill.navn) : undefined}
+            onVelg={setSpill}
+            onFjern={() => setSpill(undefined)}
+            plassholder={tr('Søk etter spill, f.eks. fotball, sjakk, padel …')}
+            merknad={(o) => {
+              const n = turneringer.filter((t) => spillNokkel(t) === oppforingNokkel(o)).length
+              return n === 0 ? undefined : n === 1 ? tr('1 turnering') : tr('{0} turneringer', n)
+            }}
+          />
         </div>
         <div className="filter-gruppe">
           <span className="etikett">{tr('Type')}</span>
