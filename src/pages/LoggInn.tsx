@@ -50,6 +50,7 @@ export function LoggInn() {
       </div>
 
       <div className="stabel">
+        {!visAdmin && (
         <form className="kort" onSubmit={deltaker} noValidate>
           <h2 style={{ marginBottom: 4 }}>{tr('Deltaker')}</h2>
           <p className="liten" style={{ marginTop: 0 }}>
@@ -68,6 +69,7 @@ export function LoggInn() {
             {tr('Logg inn som deltaker')}
           </button>
         </form>
+        )}
 
         {!visAdmin && (
           <button type="button" className="svak-lenke" onClick={() => setVisAdmin(true)}>
@@ -77,7 +79,7 @@ export function LoggInn() {
 
         {visAdmin && (
         <form className="kort" onSubmit={admin} noValidate>
-          <h2 style={{ marginBottom: 4 }}>{tr('Admin')}</h2>
+          <h2 style={{ marginBottom: 4 }}>{tr('Logg inn som admin')}</h2>
           <p className="liten" style={{ marginTop: 0 }}>
             {tr('Admin kan opprette turneringer, generere kampoppsett og registrere eller endre resultater.')}
           </p>
@@ -93,6 +95,12 @@ export function LoggInn() {
             {tr('Demo: passordet er «{0}». Innloggingen er bare en demo uten backend.', ADMIN_PASSORD)}
           </div>
         </form>
+        )}
+
+        {visAdmin && (
+          <button type="button" className="svak-lenke" onClick={() => setVisAdmin(false)}>
+            {tr('Logg inn som deltaker')}
+          </button>
         )}
       </div>
     </div>

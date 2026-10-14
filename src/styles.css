@@ -1480,3 +1480,79 @@ div.valgkort {
   background: #d8d0ff;
   color: #2a1b5c;
 }
+
+/* Spillsøk */
+.spill-sok {
+  position: relative;
+}
+.spill-liste {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--kort);
+  border: 1px solid var(--kant);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(20, 16, 50, 0.18);
+  max-height: 340px;
+  overflow-y: auto;
+}
+.spill-rad {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.spill-rad.aktiv {
+  background: var(--primar-lys);
+}
+.spill-rad.av {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.spill-navn {
+  font-weight: 600;
+  color: var(--overskrift);
+}
+.spill-hint {
+  padding: 6px 10px;
+  color: var(--tekst2);
+  font-size: 0.8rem;
+}
+.spill-foresporsel {
+  border-top: 1px solid var(--kant);
+  margin-top: 4px;
+  padding: 4px;
+  text-align: center;
+}
+.spill-valgt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.knapp.av {
+  opacity: 0.5;
+  pointer-events: none;
+}
+a.knapp {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.filter-sok {
+  flex: 1 1 320px;
+  min-width: 260px;
+  max-width: 460px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+.filter-sok .spill-sok {
+  flex: 1;
+}

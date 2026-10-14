@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Ikon } from '../components/Ikoner'
+import { SpillSok } from '../components/SpillSok'
 import { StatusMerke } from '../components/ui'
 import { DELTAKERTYPE_NAVN, TYPE_BESKRIVELSE, TYPE_NAVN, tallTekst } from '../core/format'
 import { kanVelgeDeltakertype } from '../core/kombinasjoner'
 import { foreslaaNavn } from '../core/navn'
-import { PROFILER, hentProfil, profilFor } from '../core/profiler'
+import { hentProfil, profilFor } from '../core/profiler'
+import { spillnavnFor, type SpillOppforing } from '../core/spillkatalog'
 import type { Deltakertype, Poeng, Resultatformat, Spillregler, Status, Turnering, Turneringstype } from '../core/types'
 import { tilDatoInput } from '../lib/tid'
 import { useStore } from '../store'
@@ -60,26 +61,28 @@ export function Admin() {
   const standardPoeng: Poeng | undefined = profil?.poeng
   const poengVerdi = poeng ?? (standardPoeng ? { s: String(standardPoeng.seier), u: String(standardPoeng.uavgjort), t: String(standardPoeng.tap) } : { s: '', u: '', t: '' })
 
-  const velgSpill = (id: string) => {
-    setSpillId(id)
-    const p = hentProfil(id)
+  /** Velger et spill fra søket. Fotball, sjakk og e-sport har egne regler, resten bruker «annet» med standardverdier. */
+  const velgOppforing = (o: SpillOppforing) => {
+    setSpillId(o.profil)
+    setSpillnavn(spillnavnFor(o) ?? '')
     setPoeng(undefined)
-    setDt(p.tillatteDeltakertyper.length === 1 ? p.tillatteDeltakertyper[0] : undefined)
-    if (p.id === 'fotball') setLagStr('7')
-    if (p.id === 'esport') setLagStr('5')
-    setBestOf(p.id === 'esport' ? '3' : '1')
-    if (p.id === 'annet') {
-      setAnnetFormat('MAL')
-      setAnnetUavgjort(true)
-      setAnnetEnhet('')
-    }
-    setModus(p.id === 'sjakk' ? 'RUNDER' : 'GRENSE')
+    if (o.profil === 'fotball') setLagStr('7')
+    if (o.profil === 'esport') setLagStr('5')
+    const r = o.regler
+    setBestOf(o.profil === 'esport' || r?.resultatformat === 'KART' ? '3' : '1')
+    setAnnetFormat(r?.resultatformat ?? 'MAL')
+    setAnnetUavgjort(r?.uavgjortTillatt ?? true)
+    setAnnetEnhet(r?.enhet ?? '')
+    setModus(o.profil === 'sjakk' ? 'RUNDER' : 'GRENSE')
+  }
+  const fjernSpill = () => {
+    setSpillId(undefined)
+    setSpillnavn('')
   }
 
   const opprettTurnering = () => {
     if (!profil || !type || !dt) return
     if (!navn.trim()) return setFeil(tr('Gi turneringen et navn.'))
-    if (profil.id === 'annet' && !spillnavn.trim()) return setFeil(tr('Skriv inn navnet på spillet.'))
     const m = Number(maks)
     if (!Number.isInteger(m) || m < 2 || m > 64) return setFeil(tr('Maks deltakere må være mellom 2 og 64.'))
     const bo = Number(bestOf)
@@ -92,7 +95,7 @@ export function Admin() {
     const ny: Omit<Turnering, 'id' | 'oppdatert' | 'status'> = {
       navn: navn.trim(),
       spillprofilId: profil.id,
-      spillnavn: profil.id === 'annet' ? spillnavn.trim() : undefined,
+      spillnavn: spillnavn.trim() || undefined,
       spillregler: annetRegler && { ...annetRegler, enhet: annetEnhet.trim() || undefined },
       type,
       deltakertype: dt,
@@ -173,58 +176,49 @@ export function Admin() {
 
           <div className="felt">
             <h3>
-              <span className="steg-nr">1</span>{tr('Spill')}
+              <span className="steg-nr">1</span>{tr('Deltakertype')}
             </h3>
             <div className="rutenett2" style={{ marginTop: 8 }}>
-              {PROFILER.map((p) =>
-                p.id === 'annet' ? (
-                  // «Annet»: arrangøren skriver inn spillets navn rett i valget.
-                  <div
-                    key={p.id}
-                    role="button"
-                    tabIndex={0}
-                    className={`valgkort ${spillId === p.id ? 'valgt' : ''}`}
-                    onClick={() => spillId !== p.id && velgSpill(p.id)}
-                    onKeyDown={(e) => e.key === 'Enter' && e.target === e.currentTarget && velgSpill(p.id)}
-                  >
-                    <div className="ikon-boks" style={{ width: 38, height: 38 }}>
-                      <Ikon id={p.ikon} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="tittel">{tr('Annet')}</div>
-                      <input
-                        type="text"
-                        className="annet-input"
-                        aria-label={tr('Navn på spillet')}
-                        value={spillnavn}
-                        maxLength={40}
-                        placeholder={tr('Skriv inn spill, f.eks. Padel')}
-                        onFocus={() => spillId !== p.id && velgSpill(p.id)}
-                        onChange={(e) => {
-                          if (spillId !== p.id) velgSpill(p.id)
-                          setSpillnavn(e.target.value)
-                        }}
-                      />
-                    </div>
+              {(['LAG', 'SPILLER'] as Deltakertype[]).map((tp) => (
+                <button
+                  key={tp}
+                  className={`valgkort ${dt === tp ? 'valgt' : ''}`}
+                  onClick={() => {
+                    setDt(tp)
+                    // Bytter man deltakertype, må valgt spill fortsatt passe (sjakk er bare 1 mot 1, fotball bare lag).
+                    if (profil && !kanVelgeDeltakertype(profil, tp).ok) fjernSpill()
+                  }}
+                >
+                  <div>
+                    <div className="tittel">{DELTAKERTYPE_NAVN[tp]}</div>
+                    <div className="liten">{tp === 'LAG' ? tr('Lag med flere spillere') : tr('Enkeltspillere')}</div>
                   </div>
-                ) : (
-                  <button key={p.id} className={`valgkort ${spillId === p.id ? 'valgt' : ''}`} onClick={() => velgSpill(p.id)}>
-                    <div className="ikon-boks" style={{ width: 38, height: 38 }}>
-                      <Ikon id={p.ikon} />
-                    </div>
-                    <div>
-                      <div className="tittel">{tr(p.navn)}</div>
-                      <div className="liten">{p.tillatteDeltakertyper.map((x) => DELTAKERTYPE_NAVN[x]).join(' / ')}</div>
-                    </div>
-                  </button>
-                ),
-              )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="felt" style={{ opacity: dt ? 1 : 0.5, pointerEvents: dt ? undefined : 'none' }}>
+            <h3>
+              <span className="steg-nr">2</span>{tr('Spill')}
+            </h3>
+            <div style={{ marginTop: 8 }}>
+              <SpillSok
+                valgt={profil ? tr(profil.navn) : undefined}
+                onVelg={velgOppforing}
+                onFjern={fjernSpill}
+                utilgjengelig={(o) => {
+                  if (!dt) return undefined
+                  const k = kanVelgeDeltakertype(hentProfil(o.profil), dt)
+                  return k.ok ? undefined : tr(dt === 'LAG' ? 'Spilles 1 mot 1' : 'Spilles som lag')
+                }}
+              />
             </div>
           </div>
 
           <div className="felt" style={{ opacity: profil ? 1 : 0.5 }}>
             <h3>
-              <span className="steg-nr">2</span>{tr('Turneringstype')}
+              <span className="steg-nr">3</span>{tr('Turneringstype')}
             </h3>
             <div className="rutenett2" style={{ marginTop: 8 }}>
               {TYPER.map((tp) => (
@@ -235,25 +229,6 @@ export function Admin() {
                   </div>
                 </button>
               ))}
-            </div>
-          </div>
-
-          <div className="felt" style={{ opacity: type ? 1 : 0.5 }}>
-            <h3>
-              <span className="steg-nr">3</span>{tr('Deltakertype')}
-            </h3>
-            <div className="rutenett2" style={{ marginTop: 8 }}>
-              {(['LAG', 'SPILLER'] as Deltakertype[]).map((tp) => {
-                const k = profil ? kanVelgeDeltakertype(profil, tp) : { ok: false }
-                return (
-                  <button key={tp} disabled={!type || !k.ok} className={`valgkort ${dt === tp ? 'valgt' : ''}`} onClick={() => setDt(tp)}>
-                    <div>
-                      <div className="tittel">{DELTAKERTYPE_NAVN[tp]}</div>
-                      <div className="liten">{k.ok ? (tp === 'LAG' ? 'Lag med flere spillere' : 'Enkeltspillere') : k.grunn}</div>
-                    </div>
-                  </button>
-                )
-              })}
             </div>
           </div>
 

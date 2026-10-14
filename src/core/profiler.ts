@@ -123,8 +123,10 @@ const FORMAT_FORHANDSVALG: Record<Resultatformat, Forhandsvalg> = {
 /** Spillprofilen for en turnering. For «Annet» brukes navnet og reglene arrangøren har valgt. */
 export function profilFor(t: Pick<Turnering, 'spillprofilId' | 'spillnavn' | 'spillregler'>): Spillprofil {
   const p = hentProfil(t.spillprofilId)
-  if (p.id !== 'annet') return p
+  // «Annet» og e-sport kan ha et eget spillnavn (f.eks. Padel eller Valorant). Sjakk og fotball beholder sitt.
+  if (p.id !== 'annet' && p.id !== 'esport') return p
   const base = { ...p, navn: t.spillnavn?.trim() || p.navn }
+  if (p.id === 'esport') return base
   const r = t.spillregler
   if (!r) return base
   const valg = FORMAT_FORHANDSVALG[r.resultatformat]
