@@ -13,10 +13,12 @@ import { VinnerBanner } from '../components/Vinner'
 import { DELTAKERTYPE_NAVN, TYPE_NAVN } from '../core/format'
 import { erFerdig } from '../core/regler/status'
 import type { Kamp } from '../core/types'
+import { erAdmin, useAuth } from '../lib/auth'
 import { useTurnering } from '../lib/hooks'
 import { eksporterSomBilde } from '../lib/eksport'
 import { klokkeslett } from '../lib/tid'
 import { useStore } from '../store'
+import { locale, tr } from '../lib/i18n'
 
 type Fane = 'oversikt' | 'kamper' | 'tabell' | 'statistikk'
 
@@ -27,6 +29,7 @@ export function TurneringSide() {
   const genererOppsett = useStore((s) => s.genererOppsett)
   const nesteRunde = useStore((s) => s.nesteRunde)
   const [fane, setFane] = useState<Fane>('oversikt')
+  const admin = erAdmin(useAuth((a) => a.bruker))
   const [valgtKamp, setValgtKamp] = useState<Kamp | undefined>()
   const [melding, setMelding] = useState<string | undefined>()
   const [eksporterer, setEksporterer] = useState(false)
@@ -35,7 +38,7 @@ export function TurneringSide() {
   if (!data) {
     return (
       <div className="kort tom">
-        Fant ikke turneringen. <Link to="/">Til oversikten</Link>
+        Fant ikke turneringen. <Link to="/">{tr('Til oversikten')}</Link>
       </div>
     )
   }
@@ -49,7 +52,7 @@ export function TurneringSide() {
   const uferdige = kamper.filter((k) => k.status !== 'FERDIG').length
 
   // Hold modalen i synk med nyeste data (f.eks. etter live-oppdatering).
-  const aktivKamp = valgtKamp ? kamper.find((k) => k.id === valgtKamp.id) ?? valgtKamp : undefined
+  const aktivKamp = admin && valgtKamp ? kamper.find((k) => k.id === valgtKamp.id) ?? valgtKamp : undefined
 
   const synligeFaner: { id: Fane; navn: string }[] =
     t.type === 'CUP'
@@ -68,7 +71,7 @@ export function TurneringSide() {
     try {
       await eksporterSomBilde(eksportRef.current, t.navn)
     } catch {
-      setMelding('Kunne ikke lage bildet. Prøv igjen.')
+      setMelding(tr('Kunne ikke lage bildet. Prøv igjen.'))
     } finally {
       setEksporterer(false)
     }
@@ -83,8 +86,8 @@ export function TurneringSide() {
     <div className="stabel">
       <div ref={eksportRef} className="stabel">
       <div className="eksport-merke">
-        <span>Nome Games AS</span>
-        <span>{new Date().toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+        <span>{tr('Nome Games AS')}</span>
+        <span>{new Date().toLocaleDateString(locale(), { day: 'numeric', month: 'long', year: 'numeric' })}</span>
       </div>
       <div className="rad mellomrom">
         <div className="rad">
@@ -97,20 +100,20 @@ export function TurneringSide() {
               <StatusMerke status={t.status} />
               <span className="merke lilla">{TYPE_NAVN[t.type]}</span>
               <span className="merke">{DELTAKERTYPE_NAVN[t.deltakertype]}</span>
-              <span className="merke">{profil.navn}</span>
+              <span className="merke">{tr(profil.navn)}</span>
               {t.bestOf && <span className="merke">Best av {t.bestOf}</span>}
               {swiss && harOppsett && <RundeIndikator data={data} />}
             </div>
           </div>
         </div>
         <div className="rad skjul-ved-eksport">
-          <div className="liten" title="Oppdateres automatisk">
+          <div className="liten" title={tr('Oppdateres automatisk')}>
             <span className="live-prikk" style={{ background: 'var(--primar)' }} />
-            Sist oppdatert {klokkeslett(new Date(sistOppdatert).toISOString())}
+            {tr('Sist oppdatert')} {klokkeslett(new Date(sistOppdatert).toISOString())}
           </div>
           {harOppsett && (
             <button className="knapp sek-knapp liten-knapp" onClick={eksporter} disabled={eksporterer}>
-              {eksporterer ? 'Lager bilde …' : 'Last ned som bilde'}
+              {eksporterer ? tr('Lager bilde …') : tr('Last ned som bilde')}
             </button>
           )}
         </div>
@@ -124,41 +127,45 @@ export function TurneringSide() {
         <div className="kort skjul-ved-eksport">
           <div className="rad mellomrom">
             <div>
-              <h3>Ingen kampoppsett ennå</h3>
+              <h3>{tr('Ingen kampoppsett ennå')}</h3>
               <div className="liten">
-                {deltakere.length} påmeldt av {t.maksDeltakere}. {t.status === 'PAMELDING_APEN' ? 'Påmeldingen er åpen.' : ''}
+                {tr('{0} påmeldt av {1}.', deltakere.length, t.maksDeltakere)} {t.status === 'PAMELDING_APEN' ? tr('Påmeldingen er åpen.') : ''}
               </div>
             </div>
             <div className="rad">
               {t.status === 'PAMELDING_APEN' && (
                 <Link to={`/pamelding/${t.id}`} className="knapp sek-knapp">
-                  Meld på
+                  {tr('Meld på')}
                 </Link>
               )}
-              <button className="knapp" disabled={deltakere.length < 2} onClick={() => kjor(() => genererOppsett(t.id))}>
-                Generer kampoppsett
-              </button>
+              {admin ? (
+                <button className="knapp" disabled={deltakere.length < 2} onClick={() => kjor(() => genererOppsett(t.id))}>
+                  {tr('Generer kampoppsett')}
+                </button>
+              ) : (
+                <span className="liten">{tr('Admin genererer kampoppsettet.')}</span>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {kanNeste && (
+      {admin && kanNeste && (
         <div className="kort skjul-ved-eksport">
           <div className="rad mellomrom">
             <div>
-              <h3>Runden er ferdig</h3>
+              <h3>{tr('Runden er ferdig')}</h3>
               <div className="liten">Neste runde parer deltakere med lik {grense ? 'rekord' : 'poengsum'}.</div>
             </div>
             <button className="knapp" onClick={() => kjor(() => nesteRunde(t.id))}>
-              Generer neste runde
+              {tr('Generer neste runde')}
             </button>
           </div>
         </div>
       )}
       {swiss && harOppsett && !alleFerdige && !ferdig && (
         <div className="liten skjul-ved-eksport">
-          {uferdige} kamp{uferdige === 1 ? '' : 'er'} gjenstår i runden før neste runde kan genereres.
+          {uferdige === 1 ? tr('1 kamp gjenstår i runden før neste runde kan genereres.') : tr('{0} kamper gjenstår i runden før neste runde kan genereres.', uferdige)}
         </div>
       )}
 
@@ -170,14 +177,14 @@ export function TurneringSide() {
 
           {fane === 'oversikt' && (
             <>
-              {t.type === 'CUP' && <Brakett data={data} onVelg={setValgtKamp} />}
+              {t.type === 'CUP' && <Brakett data={data} onVelg={admin ? setValgtKamp : undefined} />}
               {t.type === 'LIGA' && <Tabell data={data} />}
               {t.type === 'ALLE_MOT_ALLE' && <Tabell data={data} />}
               {swiss && !grense && <Tabell data={data} />}
               {grense && <RekordGrupper data={data} />}
             </>
           )}
-          {fane === 'kamper' && <Runder data={data} onVelg={setValgtKamp} />}
+          {fane === 'kamper' && <Runder data={data} onVelg={admin ? setValgtKamp : undefined} />}
           {fane === 'tabell' && (t.type === 'ALLE_MOT_ALLE' ? <Matrise data={data} /> : <Tabell data={data} />)}
           {fane === 'statistikk' && <StatistikkPanel data={data} />}
         </>
@@ -185,8 +192,8 @@ export function TurneringSide() {
 
       {harOppsett && fane === 'oversikt' && t.type === 'LIGA' && (
         <>
-          <h2 style={{ marginTop: 22 }}>Rundeoversikt</h2>
-          <Runder data={data} onVelg={setValgtKamp} />
+          <h2 style={{ marginTop: 22 }}>{tr('Rundeoversikt')}</h2>
+          <Runder data={data} onVelg={admin ? setValgtKamp : undefined} />
         </>
       )}
       </div>

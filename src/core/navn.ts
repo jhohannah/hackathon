@@ -15,6 +15,7 @@ const KATEGORI_ORD: Record<Spillprofil['kategori'], string[]> = {
   FYSISK: ['Mållinjen', 'Banekampen', 'Fotballfesten', 'Treffet'],
   BRETTSPILL: ['Kongejakten', 'Brettduellen', 'Bondestormen', 'Rokaden'],
   ESPORT: ['Arenaen', 'Respawn', 'Showdown', 'Nettkampen', 'Major'],
+  ANNET: ['Mesterskapet', 'Duellen', 'Storkampen', 'Finalen'],
 }
 
 const ADJEKTIV = ['Store', 'Store Nordlige', 'Åpne', 'Arktiske', 'Ville', 'Ukens', 'Gylne']

@@ -3,9 +3,10 @@ import type { Kamp } from '../core/types'
 import type { TurneringData } from '../lib/hooks'
 import { datoTekst } from '../lib/tid'
 import { KampRad } from './KampRad'
+import { tr } from '../lib/i18n'
 
 /** Kampoppsett med én fane per runde. Åpner på første runde som ikke er ferdig. */
-export function Runder({ data, onVelg }: { data: TurneringData; onVelg: (k: Kamp) => void }) {
+export function Runder({ data, onVelg }: { data: TurneringData; onVelg?: (k: Kamp) => void }) {
   const { kamper, profil, navn } = data
   const runder = useMemo(
     () => [...new Set(kamper.map((k) => k.runde))].sort((a, b) => a - b),
@@ -21,7 +22,7 @@ export function Runder({ data, onVelg }: { data: TurneringData; onVelg: (k: Kamp
   }, [data.turnering.id])
   const naa = valgt ?? aktivRunde
 
-  if (runder.length === 0) return <div className="tom">Oppsettet er ikke generert ennå.</div>
+  if (runder.length === 0) return <div className="tom">{tr('Oppsettet er ikke generert ennå.')}</div>
   const iRunden = kamper.filter((k) => k.runde === naa)
 
   return (
@@ -29,7 +30,7 @@ export function Runder({ data, onVelg }: { data: TurneringData; onVelg: (k: Kamp
       <div className="runde-faner">
         {runder.map((r) => (
           <button key={r} className={`chip ${r === naa ? 'valgt' : ''}`} onClick={() => setValgt(r)}>
-            Runde {r}
+            {tr('Runde')} {r}
           </button>
         ))}
       </div>

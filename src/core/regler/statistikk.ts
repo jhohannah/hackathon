@@ -11,6 +11,7 @@ export function beregnStatistikk(kamper: Kamp[], deltakere: Deltaker[]): Statist
   let sideB = 0
   let uavgjort = 0
   let walkovers = 0
+  let straffer = 0
   let storste: Statistikk['storsteSeier']
   const form: Statistikk['form'] = {}
   const rekke: Record<string, number> = {}
@@ -28,6 +29,7 @@ export function beregnStatistikk(kamper: Kamp[], deltakere: Deltaker[]): Statist
     sideA += a
     sideB += b
     if (!k.vinnerId) uavgjort++
+    if (k.avgjoring) straffer++
     const diff = Math.abs(a - b)
     if (diff > 0 && (!storste || diff > storste.diff)) storste = { kampId: k.id, diff }
   }
@@ -52,6 +54,7 @@ export function beregnStatistikk(kamper: Kamp[], deltakere: Deltaker[]): Statist
     snittMal: spiltUtenWo ? totaltMal / spiltUtenWo : 0,
     storsteSeier: storste,
     walkovers,
+    avgjortPaStraffer: straffer,
     uavgjortProsent: spiltUtenWo ? (uavgjort / spiltUtenWo) * 100 : 0,
     sideA,
     sideB,

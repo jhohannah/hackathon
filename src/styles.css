@@ -875,6 +875,47 @@ button.b-kamp:hover {
   color: var(--tekst2);
   font-size: 0.85rem;
 }
+/* Vei til tittelen (cup): stien står rett ved lagnavnet, ikke langt ute til høyre */
+.vei-rad {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--kant);
+  flex-wrap: wrap;
+}
+.vei-rad:last-child {
+  border-bottom: 0;
+}
+.vei-navn {
+  font-weight: 700;
+  color: var(--overskrift);
+  flex: 0 0 auto;
+  min-width: 130px;
+  max-width: 220px;
+}
+.vei-steg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: baseline;
+}
+.vei-del {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+.vei-skille {
+  color: var(--tekst2);
+}
+.vei-runde {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primar);
+  letter-spacing: 0.04em;
+}
 .form-chips {
   display: inline-flex;
   gap: 3px;
@@ -1191,33 +1232,149 @@ button.b-kamp:hover {
   border-color: var(--gull);
   box-shadow: 0 0 16px rgba(245, 184, 0, 0.6);
 }
-html[data-dramatisk='1'] {
+/* ---------- mørk modus (glider) ---------- */
+html[data-tema='mork'] {
   color-scheme: dark;
-  --bg: #0a0613;
-  --kort: #161029;
-  --kort2: #1d1536;
-  --hover: #241b45;
-  --diag: #110b22;
-  --kant: #33265c;
-  --tekst: #f4efff;
-  --tekst2: #aa9fcb;
-  --primar: #8e6bff;
-  --primar-lys: rgba(142, 107, 255, 0.2);
-  --overskrift: #ffd84d;
-  --mork: #12082b;
-  --kobling: #5f4ca8;
-  --seed-bg: rgba(142, 107, 255, 0.28);
-  --grå-bg: #2a1f4d;
-  --grå-tx: #cfc4f0;
-  --pagar-bg: #4a2411;
+  --bg: #0f1020;
+  --kort: #181a30;
+  --kort2: #1e2140;
+  --hover: #23264a;
+  --diag: #131427;
+  --kant: #2d3158;
+  --tekst: #eceefc;
+  --tekst2: #a3a8c9;
+  --primar: #9a82ff;
+  --primar-lys: rgba(154, 130, 255, 0.18);
+  --overskrift: #eceefc;
+  --mork: #14122e;
+  --kobling: #4a4f7d;
+  --seed-bg: rgba(154, 130, 255, 0.25);
+  --grå-bg: #262a4a;
+  --grå-tx: #c9cdea;
+  --pagar-bg: #47260f;
   --pagar-tx: #ffb487;
-  --apen-bg: #103a2a;
+  --apen-bg: #11392a;
   --apen-tx: #7ee3ab;
+  --feil: #ff8f88;
 }
+html[data-tema='mork'] .feilboks {
+  background: #46181f;
+  color: #ffb3b8;
+}
+html[data-tema='mork'] .knapp:disabled {
+  background: #33375c;
+  color: #8085a8;
+}
+html[data-tema='mork'] .merke.gull {
+  background: #4a3a05;
+  color: #ffd84d;
+}
+html[data-tema='mork'] .kort,
+html[data-tema='mork'] .b-kamp {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+html[data-tema='mork'] .fc.S {
+  background: #11392a;
+  color: #7ee3ab;
+}
+html[data-tema='mork'] .fc.U {
+  background: #2d3158;
+  color: #c9cdea;
+}
+html[data-tema='mork'] .fc.T {
+  background: #47260f;
+  color: #ffb487;
+}
+
+/* ---------- tema-glider, innlogging i toppen ---------- */
+.topp-hoyre {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+a.dram-knapp {
+  display: inline-block;
+  text-decoration: none;
+}
+.bruker-boks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bruker-navn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 600;
+  max-width: 280px;
+  white-space: nowrap;
+}
+.merke.rolle {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.tema-bryter {
+  position: relative;
+  width: 62px;
+  height: 30px;
+  flex: none;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.14);
+  color: #d8d0ff;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.tema-bryter.mork {
+  background: rgba(10, 8, 30, 0.7);
+}
+.tema-ikon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+}
+.tema-ikon.sol {
+  left: 8px;
+}
+.tema-ikon.maane {
+  right: 8px;
+}
+.tema-knott {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gull);
+  color: #3a2a00;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, background 0.25s;
+}
+.tema-bryter.mork .tema-knott {
+  transform: translateX(32px);
+  background: #d8d0ff;
+  color: #2a1b5c;
+}
+.tema-bryter:focus-visible {
+  outline: 2px solid var(--gull);
+  outline-offset: 2px;
+}
+
+/* ---------- dramatisk modus: bare store bokstaver og gulldetaljer, ingen eget tema ---------- */
 html[data-dramatisk='1'] body {
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  background: radial-gradient(ellipse at 50% -10%, #2a1457 0%, #0a0613 55%) fixed;
 }
 html[data-dramatisk='1'] button,
 html[data-dramatisk='1'] input,
@@ -1226,53 +1383,40 @@ html[data-dramatisk='1'] textarea {
   text-transform: inherit;
   letter-spacing: inherit;
 }
+html[data-dramatisk='1'][data-tema='mork'] {
+  --overskrift: #ffd84d;
+}
 html[data-dramatisk='1'] h1,
 html[data-dramatisk='1'] h2,
 html[data-dramatisk='1'] .turn-tittel {
-  text-shadow: 0 0 22px rgba(255, 216, 77, 0.4);
+  text-shadow: 0 0 22px rgba(245, 184, 0, 0.4);
 }
 html[data-dramatisk='1'] .hero,
 html[data-dramatisk='1'] .vinner-banner {
-  background: linear-gradient(135deg, #1b0b45, #3a145f 60%, #5a1450);
-  border: 1px solid rgba(255, 216, 77, 0.35);
-  box-shadow: 0 0 40px rgba(142, 107, 255, 0.25);
+  border: 1px solid rgba(255, 216, 77, 0.45);
+  box-shadow: 0 0 28px rgba(245, 184, 0, 0.25);
 }
 html[data-dramatisk='1'] .hero h1,
 html[data-dramatisk='1'] .vinner-banner h2 {
   color: #ffd84d;
 }
-html[data-dramatisk='1'] .kort,
-html[data-dramatisk='1'] .b-kamp {
-  box-shadow: 0 0 0 1px rgba(142, 107, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.35);
-}
 html[data-dramatisk='1'] .b-lag.vant {
   box-shadow: inset 3px 0 0 var(--gull);
 }
 html[data-dramatisk='1'] .b-kamp.finale {
-  box-shadow: 0 0 28px rgba(255, 216, 77, 0.45);
+  box-shadow: 0 0 28px rgba(245, 184, 0, 0.45);
   animation: finale-puls 2.4s ease-in-out infinite;
 }
 html[data-dramatisk='1'] .vinner-banner .troféi,
 html[data-dramatisk='1'] .mester-trofe {
-  filter: drop-shadow(0 0 14px rgba(255, 216, 77, 0.8));
+  filter: drop-shadow(0 0 14px rgba(245, 184, 0, 0.8));
 }
 html[data-dramatisk='1'] .vm-midt h4 {
   box-shadow: 0 0 18px rgba(245, 184, 0, 0.6);
 }
-html[data-dramatisk='1'] .knapp {
-  box-shadow: 0 0 18px rgba(142, 107, 255, 0.45);
-}
-html[data-dramatisk='1'] .knapp.sek-knapp,
-html[data-dramatisk='1'] .knapp.fare {
-  box-shadow: none;
-}
-html[data-dramatisk='1'] .feilboks {
-  background: #4a1620;
-  color: #ffb3b8;
-}
 @keyframes finale-puls {
   50% {
-    box-shadow: 0 0 44px rgba(255, 216, 77, 0.75);
+    box-shadow: 0 0 44px rgba(245, 184, 0, 0.75);
   }
 }
 
@@ -1289,4 +1433,50 @@ html[data-dramatisk='1'] .feilboks {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Diskret lenke under deltaker-innloggingen */
+.svak-lenke {
+  align-self: center;
+  background: none;
+  border: 0;
+  padding: 4px;
+  color: var(--tekst2);
+  font-size: 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.svak-lenke:hover {
+  color: var(--primar);
+}
+.valgkort .annet-input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 5px 8px;
+}
+div.valgkort {
+  cursor: pointer;
+}
+
+/* Språkvelger NO / EN */
+.sprak-bryter {
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.sprak-bryter button {
+  background: transparent;
+  border: 0;
+  color: #d8d0ff;
+  padding: 6px 10px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.sprak-bryter button.aktiv {
+  background: #d8d0ff;
+  color: #2a1b5c;
 }

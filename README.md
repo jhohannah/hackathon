@@ -39,8 +39,16 @@ spillspesifikt kommer fra profilen.
 - **Seeding** (cup): rating, tilfeldig eller manuell rekkefølge. De to beste seedene havner i hver sin halvdel, så de kan møtes først i finalen.
 - **VM-brakett**: to halvdeler som møtes i finalen i midten, med koblingslinjer.
 - **Eksporter som bilde**: «Last ned som bilde» på turneringssiden lager en PNG.
-- **Dramatisk modus**: knapp i toppen, gjør all tekst til STORE BOKSTAVER.
+- **Dramatisk modus**: knapp i toppen, gjør all tekst til STORE BOKSTAVER og legger på gulldetaljer. Fungerer likt i lys og mørk modus.
 - **Navneforslag**: «Foreslå navn» i Admin.
+- **Språk**: NO/EN-knapp i toppen. Norsk er originalspråket. Engelsk ligger som ordliste i `src/lib/en.ts`, og tekster uten oversettelse vises på norsk. Meldinger fra kjernen (f.eks. feil ved registrering av resultat) er foreløpig bare på norsk.
+- **Mørk modus**: glider (sol/måne) i toppen. Valget lagres, og første gang følger det nettleserens innstilling.
+- **Innlogging**: «Logg inn» i toppen.
+  - Deltaker-innlogging vises først. «Logg inn som admin» ligger som en svak lenke under.
+  - *Admin* (demo-passord `admin`): kan opprette turneringer, generere kampoppsett og registrere/endre resultater.
+  - *Deltaker* (navn, e-post valgfritt): kan melde seg på og følge med, men ikke opprette eller endre turneringer. Navn og e-post fylles inn i påmeldingen.
+  - Dette er en demo uten backend, så passordet ligger i koden (`src/lib/auth.ts`) og gir ingen reell sikkerhet.
+- **Annet**: skriv inn spillets navn rett i «Annet»-valget i steg 1 i Admin (f.eks. bordtennis). Fungerer med alle turneringstyper, med resultat som poeng/mål.
 - **Walkover**: lag som ikke møter opp taper, og det andre laget får seieren og full poengsum.
 
 ## Legge til et nytt spill

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { STATUS_NAVN } from '../core/format'
 import type { Status } from '../core/types'
+import { tr } from '../lib/i18n'
 
 export function StatusMerke({ status }: { status: Status }) {
   return <span className={`merke ${status}`}>{STATUS_NAVN[status]}</span>
@@ -9,11 +10,11 @@ export function StatusMerke({ status }: { status: Status }) {
 export function Modal({ children, onClose, tittel }: { children: ReactNode; onClose: () => void; tittel: string }) {
   return (
     <div className="bakteppe" onClick={onClose} role="presentation">
-      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={tittel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={tr(tittel)}>
         <div className="rad mellomrom">
-          <h2>{tittel}</h2>
+          <h2>{tr(tittel)}</h2>
           <button className="knapp sek-knapp liten-knapp" onClick={onClose}>
-            Lukk
+            {tr('Lukk')}
           </button>
         </div>
         {children}
@@ -41,7 +42,7 @@ export function Faner<T extends string>({
           className={`fane ${valgt === f.id ? 'aktiv' : ''}`}
           onClick={() => onVelg(f.id)}
         >
-          {f.navn}
+          {tr(f.navn)}
         </button>
       ))}
     </div>

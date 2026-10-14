@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { hentProfil } from './core/profiler'
+import { profilFor } from './core/profiler'
 import { genererCup, seedDeltakere } from './core/generatorer/cup'
 import { genererLiga, genererRoundRobin } from './core/generatorer/rundeturnering'
 import { registrerResultat, registrerWalkover } from './core/regler/resultat'
@@ -55,7 +55,7 @@ const startData = () => lagSeed()
 
 /** Setter status ut fra kampene og oppdaterer tidsstempelet. */
 function medStatus(t: Turnering, kamper: Kamp[], deltakere: Deltaker[]): Turnering {
-  const profil = hentProfil(t.spillprofilId)
+  const profil = profilFor(t)
   return {
     ...t,
     status: beregnStatus(
@@ -93,7 +93,7 @@ export const useStore = create<State>()(
         const s = get()
         const t = s.turneringer.find((x) => x.id === turneringId)
         if (!t) return { ok: false, feil: { generelt: 'Fant ikke turneringen.' } }
-        const profil = hentProfil(t.spillprofilId)
+        const profil = profilFor(t)
         const eksisterende = s.deltakere.filter((d) => d.turneringId === turneringId)
         const feil = validerPamelding(input, t, profil, eksisterende)
         if (harFeil(feil)) return { ok: false, feil }
@@ -167,7 +167,7 @@ export const useStore = create<State>()(
         } else if (t.type === 'ALLE_MOT_ALLE') {
           nye = genererRoundRobin(ids, { turneringId: t.id, start, minutterPerKamp: t.minutterPerKamp ?? 45 })
         } else {
-          const res = genererNesteRunde(t, d, [], hentProfil(t.spillprofilId), start)
+          const res = genererNesteRunde(t, d, [], profilFor(t), start)
           if (!res.ok) return res
           nye = res.kamper
         }
@@ -189,7 +189,7 @@ export const useStore = create<State>()(
         if (!t) return { ok: false, feil: 'Fant ikke turneringen.' }
         const d = s.deltakere.filter((x) => x.turneringId === turneringId)
         const k = s.kamper.filter((x) => x.turneringId === turneringId)
-        const res = genererNesteRunde(t, d, k, hentProfil(t.spillprofilId), new Date().toISOString())
+        const res = genererNesteRunde(t, d, k, profilFor(t), new Date().toISOString())
         if (!res.ok) return res
         const kamper = [...s.kamper, ...res.kamper]
         set({
@@ -205,7 +205,7 @@ export const useStore = create<State>()(
         const kamp = s.kamper.find((k) => k.id === kampId)
         if (!kamp) return { ok: false, feil: 'Fant ikke kampen.' }
         const t = s.turneringer.find((x) => x.id === kamp.turneringId)!
-        const profil = hentProfil(t.spillprofilId)
+        const profil = profilFor(t)
         const res = registrerResultat(kamp, input, profil, s.kamper, {
           kreverVinner: kreverVinner(t),
           bestOf: t.bestOf,
@@ -225,7 +225,7 @@ export const useStore = create<State>()(
         const kamp = s.kamper.find((k) => k.id === kampId)
         if (!kamp) return { ok: false, feil: 'Fant ikke kampen.' }
         const t = s.turneringer.find((x) => x.id === kamp.turneringId)!
-        const profil = hentProfil(t.spillprofilId)
+        const profil = profilFor(t)
         const res = registrerWalkover(kamp, moette, profil, s.kamper, {
           bestOf: t.bestOf,
           erCup: kreverVinner(t),

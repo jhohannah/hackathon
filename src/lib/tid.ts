@@ -1,3 +1,5 @@
+import { locale, tr } from './i18n'
+
 export function erIDag(iso: string, na: Date = new Date()): boolean {
   const d = new Date(iso)
   return (
@@ -8,15 +10,15 @@ export function erIDag(iso: string, na: Date = new Date()): boolean {
 }
 
 export function klokkeslett(iso: string): string {
-  return new Date(iso).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' })
+  return new Date(iso).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
 }
 
 export function datoTekst(iso: string): string {
-  return new Date(iso).toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short' })
+  return new Date(iso).toLocaleDateString(locale(), { weekday: 'short', day: 'numeric', month: 'short' })
 }
 
 export function datoTid(iso: string): string {
-  return erIDag(iso) ? `I dag ${klokkeslett(iso)}` : `${datoTekst(iso)} ${klokkeslett(iso)}`
+  return erIDag(iso) ? `${tr('I dag')} ${klokkeslett(iso)}` : `${datoTekst(iso)} ${klokkeslett(iso)}`
 }
 
 export function tilDatoInput(iso: string): string {

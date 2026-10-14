@@ -4,12 +4,13 @@ import { Ikon } from '../components/Ikoner'
 import { KampRad } from '../components/KampRad'
 import { StatusMerke } from '../components/ui'
 import { DELTAKERTYPE_NAVN, TYPE_NAVN } from '../core/format'
-import { PROFILER, hentProfil } from '../core/profiler'
+import { PROFILER, profilFor } from '../core/profiler'
 import { beregnTabell } from '../core/regler/tabell'
 import { kaarVinner } from '../core/regler/vinner'
 import type { Status, Turnering, Turneringstype } from '../core/types'
 import { erIDag } from '../lib/tid'
 import { useStore } from '../store'
+import { tr } from '../lib/i18n'
 
 const STATUSER: Status[] = ['PAMELDING_APEN', 'PAGAR', 'AVSLUTTET', 'KOMMER']
 const STATUS_TEKST: Record<Status, string> = {
@@ -34,7 +35,7 @@ export function Oversikt() {
   )
   const turnMap = useMemo(() => new Map(turneringer.map((t) => [t.id, t])), [turneringer])
   const deltakerNavn = useMemo(() => new Map(deltakere.map((d) => [d.id, d.visningsnavn])), [deltakere])
-  const navn = (id?: string) => (id ? deltakerNavn.get(id) ?? '?' : 'Venter …')
+  const navn = (id?: string) => (id ? deltakerNavn.get(id) ?? '?' : tr('Venter …'))
 
   const idag = kamper
     .filter((k) => !k.erBye && erIDag(k.tidspunkt) && turnMap.get(k.turneringId)?.status !== 'KOMMER')
@@ -45,7 +46,7 @@ export function Oversikt() {
 
   const vinnerAv = (t: Turnering): string | undefined => {
     if (t.status !== 'AVSLUTTET') return undefined
-    const profil = hentProfil(t.spillprofilId)
+    const profil = profilFor(t)
     const d = deltakere.filter((x) => x.turneringId === t.id)
     const k = kamper.filter((x) => x.turneringId === t.id)
     const v = kaarVinner(t, k, beregnTabell(k, d, profil, t)).vinner
@@ -58,27 +59,27 @@ export function Oversikt() {
     <>
       <div className="hero">
         <div>
-          <h1>Turneringer</h1>
-          <p>Cup, liga, alle mot alle og Swiss stage – i fotball, sjakk og e-sport.</p>
+          <h1>{tr('Turneringer')}</h1>
+          <p>{tr('Cup, liga, alle mot alle og Swiss stage – i fotball, sjakk og e-sport.')}</p>
         </div>
         <Link to="/pamelding" className="knapp lys" style={{ display: 'inline-flex', alignItems: 'center' }}>
-          Meld deg på
+          {tr('Meld deg på')}
         </Link>
       </div>
 
       <div className="filter-rad">
         <div className="filter-gruppe">
-          <span className="etikett">Spill</span>
-          <button className={`chip ${!spill ? 'valgt' : ''}`} onClick={() => setSpill(undefined)}>Alle</button>
+          <span className="etikett">{tr('Spill')}</span>
+          <button className={`chip ${!spill ? 'valgt' : ''}`} onClick={() => setSpill(undefined)}>{tr('Alle')}</button>
           {PROFILER.map((p) => (
             <button key={p.id} className={`chip ${spill === p.id ? 'valgt' : ''}`} onClick={() => setSpill(p.id)}>
-              {p.navn}
+              {tr(p.navn)}
             </button>
           ))}
         </div>
         <div className="filter-gruppe">
-          <span className="etikett">Type</span>
-          <button className={`chip ${!type ? 'valgt' : ''}`} onClick={() => setType(undefined)}>Alle</button>
+          <span className="etikett">{tr('Type')}</span>
+          <button className={`chip ${!type ? 'valgt' : ''}`} onClick={() => setType(undefined)}>{tr('Alle')}</button>
           {(Object.keys(TYPE_NAVN) as Turneringstype[]).map((t) => (
             <button key={t} className={`chip ${type === t ? 'valgt' : ''}`} onClick={() => setType(t)}>
               {TYPE_NAVN[t]}
@@ -86,22 +87,22 @@ export function Oversikt() {
           ))}
         </div>
         <div className="filter-gruppe">
-          <span className="etikett">Status</span>
-          <button className={`chip ${!status ? 'valgt' : ''}`} onClick={() => setStatus(undefined)}>Alle</button>
+          <span className="etikett">{tr('Status')}</span>
+          <button className={`chip ${!status ? 'valgt' : ''}`} onClick={() => setStatus(undefined)}>{tr('Alle')}</button>
           {STATUSER.map((s) => (
             <button key={s} className={`chip ${status === s ? 'valgt' : ''}`} onClick={() => setStatus(s)}>
-              {STATUS_TEKST[s]}
+              {tr(STATUS_TEKST[s])}
             </button>
           ))}
         </div>
       </div>
 
       {filtrert.length === 0 ? (
-        <div className="kort tom">Ingen turneringer matcher filtrene.</div>
+        <div className="kort tom">{tr('Ingen turneringer matcher filtrene.')}</div>
       ) : (
         <div className="rutenett">
           {filtrert.map((t) => {
-            const profil = hentProfil(t.spillprofilId)
+            const profil = profilFor(t)
             const vinner = vinnerAv(t)
             return (
               <Link key={t.id} to={`/turnering/${t.id}`} className="kort turn-kort">
@@ -111,7 +112,7 @@ export function Oversikt() {
                   </div>
                   <div>
                     <div className="turn-tittel">{t.navn}</div>
-                    <div className="liten">{profil.navn}</div>
+                    <div className="liten">{tr(profil.navn)}</div>
                   </div>
                 </div>
                 <div className="merker">
@@ -120,11 +121,11 @@ export function Oversikt() {
                   <span className="merke">{DELTAKERTYPE_NAVN[t.deltakertype]}</span>
                 </div>
                 <div className="liten" style={{ marginTop: 10 }}>
-                  {antallPaa(t)} / {t.maksDeltakere} deltakere
+                  {antallPaa(t)} / {t.maksDeltakere} {tr('deltakere')}
                   {vinner && (
                     <>
                       {' · '}
-                      <span className="merke gull">Vinner: {vinner}</span>
+                      <span className="merke gull">{tr('Vinner')}: {vinner}</span>
                     </>
                   )}
                 </div>
@@ -139,7 +140,7 @@ export function Oversikt() {
           <div className="seksjon-tittel">
             <h2>
               <span className="live-prikk" />
-              Pågår nå
+              {tr('Pågår nå')}
             </h2>
           </div>
           <div className="kort ren">
@@ -150,7 +151,7 @@ export function Oversikt() {
                   key={k.id}
                   kamp={k}
                   navn={navn}
-                  profil={hentProfil(t.spillprofilId)}
+                  profil={profilFor(t)}
                   turneringsnavn={t.navn}
                   onVelg={() => navigate(`/turnering/${t.id}`)}
                 />
@@ -161,18 +162,18 @@ export function Oversikt() {
       )}
 
       <div className="seksjon-tittel">
-        <h2>Dagens kamper</h2>
+        <h2>{tr('Dagens kamper')}</h2>
         <div className="rad">
           <span className="liten">{idagSynlige.length} kamper</span>
           {antallFerdigeIdag > 0 && (
             <button className="chip" onClick={() => setVisFerdige(!visFerdige)}>
-              {visFerdige ? 'Skjul ferdige' : `Vis ferdige (${antallFerdigeIdag})`}
+              {visFerdige ? tr('Skjul ferdige') : tr('Vis ferdige ({0})', antallFerdigeIdag)}
             </button>
           )}
         </div>
       </div>
       {idagSynlige.length === 0 ? (
-        <div className="kort tom">Ingen kamper igjen i dag.</div>
+        <div className="kort tom">{tr('Ingen kamper igjen i dag.')}</div>
       ) : (
         <div className="kort ren">
           {idagSynlige.map((k) => {
@@ -182,7 +183,7 @@ export function Oversikt() {
                 key={k.id}
                 kamp={k}
                 navn={navn}
-                profil={hentProfil(t.spillprofilId)}
+                profil={profilFor(t)}
                 turneringsnavn={t.navn}
                 onVelg={() => navigate(`/turnering/${t.id}`)}
               />

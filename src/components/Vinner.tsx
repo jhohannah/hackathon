@@ -1,5 +1,6 @@
 import { Ikon, Trofe } from './Ikoner'
 import type { TurneringData } from '../lib/hooks'
+import { tr } from '../lib/i18n'
 
 export function VinnerBanner({ data }: { data: TurneringData }) {
   const { pallen, navn, profil, turnering } = data
@@ -11,7 +12,7 @@ export function VinnerBanner({ data }: { data: TurneringData }) {
     <div className="vinner-banner">
       <Trofe className="troféi" />
       <div>
-        <div className="etikett">{grense ? 'Beste rekord' : 'Vinner'}</div>
+        <div className="etikett">{grense ? tr('Beste rekord') : tr('Vinner')}</div>
         <h2>{navn(pallen.vinner)}</h2>
         <div className="rad" style={{ gap: 6, color: '#d8d0ff', fontSize: '0.9rem' }}>
           <Ikon id={profil.ikon} className="" />
@@ -19,12 +20,12 @@ export function VinnerBanner({ data }: { data: TurneringData }) {
         </div>
         {grense && pallen.videre && (
           <div style={{ marginTop: 8, color: '#d8d0ff' }}>
-            Videre: {pallen.videre.map((id) => navn(id)).join(', ')}
+            {tr('Videre')}: {pallen.videre.map((id) => navn(id)).join(', ')}
           </div>
         )}
       </div>
       {!grense && (
-        <div className="pall" aria-label="Pallen">
+        <div className="pall" aria-label={tr('Pallen')}>
           {pallen.andre && (
             <div className="pall-s n2">
               <div className="nr">2</div>

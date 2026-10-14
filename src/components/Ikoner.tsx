@@ -30,6 +30,19 @@ export function Ikon({ id, className }: { id: IkonId; className?: string }) {
       </svg>
     )
   }
+  if (id === 'ANNET') {
+    // Terning
+    return (
+      <svg {...felles} className={className} aria-hidden>
+        <rect x="5" y="5" width="22" height="22" rx="5" />
+        <circle cx="11.5" cy="11.5" r="1.3" fill="currentColor" />
+        <circle cx="20.5" cy="11.5" r="1.3" fill="currentColor" />
+        <circle cx="16" cy="16" r="1.3" fill="currentColor" />
+        <circle cx="11.5" cy="20.5" r="1.3" fill="currentColor" />
+        <circle cx="20.5" cy="20.5" r="1.3" fill="currentColor" />
+      </svg>
+    )
+  }
   // Spillkontroller
   return (
     <svg {...felles} className={className} aria-hidden>

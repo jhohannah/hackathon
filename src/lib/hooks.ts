@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { hentProfil } from '../core/profiler'
+import { profilFor } from '../core/profiler'
 import { beregnTabell } from '../core/regler/tabell'
 import { kaarVinner } from '../core/regler/vinner'
 import { beregnStatistikk } from '../core/regler/statistikk'
@@ -14,7 +14,7 @@ export function useTurnering(id: string | undefined) {
   return useMemo(() => {
     const turnering = turneringer.find((t) => t.id === id)
     if (!turnering) return undefined
-    const profil = hentProfil(turnering.spillprofilId)
+    const profil = profilFor(turnering)
     const deltakere = alleDeltakere.filter((d) => d.turneringId === turnering.id)
     const kamper = alleKamper.filter((k) => k.turneringId === turnering.id)
     const tabell = beregnTabell(kamper, deltakere, profil, turnering)

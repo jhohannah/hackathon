@@ -3,13 +3,14 @@ import type { Kamp } from '../core/types'
 import type { TurneringData } from '../lib/hooks'
 import { datoTid } from '../lib/tid'
 import { Trofe } from './Ikoner'
+import { tr } from '../lib/i18n'
 
 type Vis = (k: Kamp) => void
 
-function MatchKort({ kamp, data, onVelg, finale }: { kamp: Kamp; data: TurneringData; onVelg: Vis; finale?: boolean }) {
+function MatchKort({ kamp, data, onVelg, finale }: { kamp: Kamp; data: TurneringData; onVelg?: Vis; finale?: boolean }) {
   const { profil, navn, deltakere } = data
   const ferdig = kamp.status === 'FERDIG'
-  const klikkbar = !!kamp.deltakerAId && !!kamp.deltakerBId && !kamp.erBye
+  const klikkbar = !!onVelg && !!kamp.deltakerAId && !!kamp.deltakerBId && !kamp.erBye
   const Tag = klikkbar ? 'button' : 'div'
   const dekor = avgjoringTekst(kamp)
   const seedAv = (id?: string) => deltakere.find((d) => d.id === id)?.seed
@@ -22,7 +23,7 @@ function MatchKort({ kamp, data, onVelg, finale }: { kamp: Kamp; data: Turnering
       <div className={`b-lag ${vant ? 'vant' : ''} ${tapt ? 'tapt' : ''} ${!id ? 'tom' : ''}`}>
         <span className="b-navn">
           {seed !== undefined && <span className="seed">{seed}</span>}
-          {id ? navn(id) : kamp.erBye ? 'Bye' : 'Venter …'}
+          {id ? navn(id) : kamp.erBye ? 'Bye' : tr('Venter …')}
         </span>
         <span className="b-score">{ferdig && !kamp.erBye ? sideTekst(score, profil) : ''}</span>
       </div>
@@ -32,14 +33,14 @@ function MatchKort({ kamp, data, onVelg, finale }: { kamp: Kamp; data: Turnering
   return (
     <Tag
       className={`b-kamp ${finale ? 'finale' : ''} ${kamp.erBye ? 'bye' : ''}`}
-      {...(klikkbar ? { onClick: () => onVelg(kamp), type: 'button' as const } : {})}
+      {...(klikkbar ? { onClick: () => onVelg!(kamp), type: 'button' as const } : {})}
     >
       {rad(kamp.deltakerAId, kamp.resultatA)}
       {!kamp.erBye && rad(kamp.deltakerBId, kamp.resultatB)}
       <div className="b-info">
-        <span>{kamp.erBye ? 'Frirunde' : (dekor ?? (ferdig ? 'Ferdig' : datoTid(kamp.tidspunkt)))}</span>
-        {kamp.status === 'PAGAR' && <span className="b-live">Pågår</span>}
-        {klikkbar && kamp.status === 'PLANLAGT' && <span className="b-registrer">Registrer</span>}
+        <span>{kamp.erBye ? tr('Frirunde') : (dekor ?? (ferdig ? tr('Ferdig') : datoTid(kamp.tidspunkt)))}</span>
+        {kamp.status === 'PAGAR' && <span className="b-live">{tr('Pågår')}</span>}
+        {klikkbar && kamp.status === 'PLANLAGT' && <span className="b-registrer">{tr('Registrer')}</span>}
       </div>
     </Tag>
   )
@@ -56,7 +57,7 @@ function Kolonne({
   antallRunder: number
   kamper: Kamp[]
   data: TurneringData
-  onVelg: Vis
+  onVelg?: Vis
 }) {
   return (
     <div className="vm-kol">
@@ -77,10 +78,10 @@ function Kolonne({
 }
 
 /** VM-aktig brakett: to halvdeler som møtes i finalen i midten, med koblingslinjer. */
-export function Brakett({ data, onVelg }: { data: TurneringData; onVelg: Vis }) {
+export function Brakett({ data, onVelg }: { data: TurneringData; onVelg?: Vis }) {
   const { kamper, navn, pallen, turnering } = data
   const antallRunder = kamper.reduce((m, k) => Math.max(m, k.runde), 0)
-  if (antallRunder === 0) return <div className="tom">Braketten er ikke generert ennå.</div>
+  if (antallRunder === 0) return <div className="tom">{tr('Braketten er ikke generert ennå.')}</div>
 
   const finale = kamper.find((k) => k.runde === antallRunder)!
   const runderMedHalvdel = Array.from({ length: antallRunder - 1 }, (_, i) => i + 1)
@@ -113,7 +114,7 @@ export function Brakett({ data, onVelg }: { data: TurneringData; onVelg: Vis }) 
                 {turnering.status === 'AVSLUTTET' && pallen.vinner ? (
                   <div className="mester">
                     <Trofe className="mester-trofe" />
-                    <div className="mester-etikett">Mester</div>
+                    <div className="mester-etikett">{tr('Mester')}</div>
                     <div className="mester-navn">{navn(pallen.vinner)}</div>
                   </div>
                 ) : (

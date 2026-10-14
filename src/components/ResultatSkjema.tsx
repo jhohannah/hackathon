@@ -6,6 +6,7 @@ import type { Kamp, ResultatInput, Side } from '../core/types'
 import type { TurneringData } from '../lib/hooks'
 import { useStore } from '../store'
 import { Modal } from './ui'
+import { tr } from '../lib/i18n'
 
 export function ResultatSkjema({
   kamp,
@@ -51,15 +52,15 @@ export function ResultatSkjema({
   const lagre = () => {
     let input: ResultatInput
     if (format === 'MAL') {
-      if (Number.isNaN(nA) || Number.isNaN(nB)) return setFeil('Fyll inn begge målfeltene.')
+      if (Number.isNaN(nA) || Number.isNaN(nB)) return setFeil(tr('Fyll inn begge målfeltene.'))
       input = { A: nA, B: nB }
       if (trengerStraffer) input.straffer = { A: Number(sA), B: Number(sB) }
     } else if (format === 'SJAKK') {
-      if (!sjakk) return setFeil('Velg resultat: 1–0, ½–½ eller 0–1.')
+      if (!sjakk) return setFeil(tr('Velg resultat: 1–0, ½–½ eller 0–1.'))
       input = { A: sjakk[0], B: sjakk[1] }
       if (trengerArma) input.armageddonVinner = arma
     } else {
-      if (!kart) return setFeil('Velg kartresultatet.')
+      if (!kart) return setFeil(tr('Velg kartresultatet.'))
       input = { A: kart[0], B: kart[1] }
     }
     const res = lagreResultat(kamp.id, input)
@@ -88,12 +89,12 @@ export function ResultatSkjema({
       <div className="modal-lag">
         <div>
           {nA_navn}
-          {format !== 'KART' && <div className="smaa">{profil.sideNavn.A}</div>}
+          {format !== 'KART' && <div className="smaa">{tr(profil.sideNavn.A)}</div>}
         </div>
-        <div className="vs">VS</div>
+        <div className="vs">{tr('VS')}</div>
         <div>
           {nB_navn}
-          {format !== 'KART' && <div className="smaa">{profil.sideNavn.B}</div>}
+          {format !== 'KART' && <div className="smaa">{tr(profil.sideNavn.B)}</div>}
         </div>
       </div>
 
@@ -102,19 +103,19 @@ export function ResultatSkjema({
       {format === 'MAL' && (
         <>
           <div className="tall-felt">
-            <input type="number" inputMode="numeric" min={0} value={a} onChange={(e) => setA(e.target.value)} aria-label={`Mål ${nA_navn}`} />
+            <input type="number" inputMode="numeric" min={0} value={a} onChange={(e) => setA(e.target.value)} aria-label={`${tr('Mål')} ${nA_navn}`} />
             <span>–</span>
-            <input type="number" inputMode="numeric" min={0} value={b} onChange={(e) => setB(e.target.value)} aria-label={`Mål ${nB_navn}`} />
+            <input type="number" inputMode="numeric" min={0} value={b} onChange={(e) => setB(e.target.value)} aria-label={`${tr('Mål')} ${nB_navn}`} />
           </div>
           {trengerStraffer && (
             <div style={{ marginTop: 16 }}>
               <div className="liten" style={{ marginBottom: 6 }}>
-                Uavgjort etter ekstraomganger – skriv inn straffeoppgjøret:
+                {tr('Uavgjort etter ekstraomganger – skriv inn straffeoppgjøret:')}
               </div>
               <div className="tall-felt">
-                <input type="number" inputMode="numeric" min={0} value={sA} onChange={(e) => setSA(e.target.value)} aria-label="Straffer A" />
+                <input type="number" inputMode="numeric" min={0} value={sA} onChange={(e) => setSA(e.target.value)} aria-label={tr('Straffer A')} />
                 <span>–</span>
-                <input type="number" inputMode="numeric" min={0} value={sB} onChange={(e) => setSB(e.target.value)} aria-label="Straffer B" />
+                <input type="number" inputMode="numeric" min={0} value={sB} onChange={(e) => setSB(e.target.value)} aria-label={tr('Straffer B')} />
               </div>
             </div>
           )}
@@ -137,7 +138,7 @@ export function ResultatSkjema({
           {trengerArma && (
             <div style={{ marginTop: 16 }}>
               <div className="liten" style={{ marginBottom: 6 }}>
-                Remis i cup – hvem vant armageddon-partiet?
+                {tr('Remis i cup – hvem vant armageddon-partiet?')}
               </div>
               <div className="store-knapper fire">
                 {(['A', 'B'] as Side[]).map((s) => (
@@ -154,7 +155,7 @@ export function ResultatSkjema({
       {format === 'KART' && (
         <>
           <div className="liten" style={{ marginBottom: 6 }}>
-            Kartresultat (best av {turnering.bestOf ?? 1})
+            {tr('Kartresultat (best av {0})', turnering.bestOf ?? 1)}
           </div>
           <div className="store-knapper fire">
             {kartValg.map(([x, y]) => (
@@ -172,7 +173,7 @@ export function ResultatSkjema({
 
       <div className="rad" style={{ marginTop: 18 }}>
         <button className="knapp" onClick={lagre} style={{ flex: 1 }}>
-          Lagre resultat
+          {tr('Lagre resultat')}
         </button>
         {kamp.status === 'PLANLAGT' && (
           <button
@@ -182,7 +183,7 @@ export function ResultatSkjema({
               onLukk()
             }}
           >
-            Start kamp
+            {tr('Start kamp')}
           </button>
         )}
       </div>
@@ -190,23 +191,23 @@ export function ResultatSkjema({
       <div className="skille" />
       {!visForfall ? (
         <button className="knapp sek-knapp liten-knapp" onClick={() => setVisForfall(true)}>
-          Møtte ikke opp (walkover)
+          {tr('Møtte ikke opp (walkover)')}
         </button>
       ) : (
         <div>
           <div className="liten" style={{ marginBottom: 6 }}>
-            Den som møtte opp får seieren ({format === 'KART' ? `${vinn}–0` : `${profil.walkoverResultat.vinner}–${profil.walkoverResultat.taper}`}) og full poengsum, som om de hadde vunnet.
+            {tr('Den som møtte opp får seieren ({0}) og full poengsum, som om de hadde vunnet.', format === 'KART' ? `${vinn}–0` : `${profil.walkoverResultat.vinner}–${profil.walkoverResultat.taper}`)}
           </div>
           <div className="stabel" style={{ display: 'grid', gap: 8 }}>
             <button className="knapp sek-knapp" onClick={() => forfall('B')}>
-              {nA_navn} møtte ikke opp
+              {tr('{0} møtte ikke opp', nA_navn)}
             </button>
             <button className="knapp sek-knapp" onClick={() => forfall('A')}>
-              {nB_navn} møtte ikke opp
+              {tr('{0} møtte ikke opp', nB_navn)}
             </button>
             {!krever && (
               <button className="knapp fare" onClick={() => forfall('INGEN')}>
-                Ingen møtte
+                {tr('Ingen møtte')}
               </button>
             )}
           </div>
