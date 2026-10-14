@@ -1,6 +1,7 @@
 import { tallTekst } from '../core/format'
 import { maksRunder, sveitsiskInnstillinger } from '../core/regler/sveitsisk'
 import type { TurneringData } from '../lib/hooks'
+import { tr } from '../lib/i18n'
 
 /** Swiss stage (GRENSE): deltakere gruppert på rekord med Videre/Ute-markører. */
 export function RekordGrupper({ data }: { data: TurneringData }) {
@@ -29,9 +30,9 @@ export function RekordGrupper({ data }: { data: TurneringData }) {
               <span className="overskrift">
                 {seire}–{tap}
               </span>
-              {videre && <span className="merke videre">Videre</span>}
-              {ute && <span className="merke ute">Ute</span>}
-              {!videre && !ute && <span className="merke lilla">I spill</span>}
+              {videre && <span className="merke videre">{tr('Videre')}</span>}
+              {ute && <span className="merke ute">{tr('Ute')}</span>}
+              {!videre && !ute && <span className="merke lilla">{tr('I spill')}</span>}
             </div>
             {rader.map((r) => (
               <div className="rekord-rad" key={r.deltakerId}>
@@ -53,7 +54,7 @@ export function RundeIndikator({ data }: { data: TurneringData }) {
   const s = sveitsiskInnstillinger(turnering, deltakere.length)
   return (
     <span className="merke lilla">
-      Runde {naa} av {s.modus === 'RUNDER' ? maks : `maks ${maks}`}
+      {tr('Runde')} {naa} {tr('av')} {s.modus === 'RUNDER' ? maks : `${tr('maks')} ${maks}`}
     </span>
   )
 }

@@ -7,8 +7,8 @@ export type Status = 'KOMMER' | 'PAMELDING_APEN' | 'PAGAR' | 'AVSLUTTET'
 export type KampStatus = 'PLANLAGT' | 'PAGAR' | 'FERDIG'
 export type Resultatformat = 'MAL' | 'SJAKK' | 'KART'
 export type Avgjoringsmetode = 'EKSTRAOMGANGER_STRAFFER' | 'ARMAGEDDON' | 'INGEN'
-export type IkonId = 'SJAKK' | 'FOTBALL' | 'ESPORT'
-export type Kategori = 'FYSISK' | 'BRETTSPILL' | 'ESPORT'
+export type IkonId = 'SJAKK' | 'FOTBALL' | 'ESPORT' | 'ANNET'
+export type Kategori = 'FYSISK' | 'BRETTSPILL' | 'ESPORT' | 'ANNET'
 export type Side = 'A' | 'B'
 
 export type TiebreakerId =
@@ -59,10 +59,23 @@ export interface SveitsiskInnstillinger {
   byePoeng?: number
 }
 
+/** Regler admin velger selv for spillet «Annet». */
+export interface Spillregler {
+  /** Hva som skrives inn som resultat: poengsum/mål, seier/remis/tap eller kart/sett. */
+  resultatformat: Resultatformat
+  /** Bare for poengsum/mål: kan en kamp ende uavgjort? */
+  uavgjortTillatt?: boolean
+  /** Hva det telles i, f.eks. «poeng», «sett» eller «mål». */
+  enhet?: string
+}
+
 export interface Turnering {
   id: string
   navn: string
   spillprofilId: string
+  /** Eget navn på spillet. Brukes når spillet er «Annet». */
+  spillnavn?: string
+  spillregler?: Spillregler
   type: Turneringstype
   deltakertype: Deltakertype
   status: Status
@@ -163,6 +176,8 @@ export interface Statistikk {
   storsteSeier?: { kampId: string; diff: number }
   walkovers: number
   uavgjortProsent: number
+  /** Kamper avgjort på straffer (eller armageddon i sjakk). */
+  avgjortPaStraffer: number
   sideA: number
   sideB: number
   form: Record<string, ('S' | 'U' | 'T')[]>

@@ -1,3 +1,4 @@
+import { oversatt, tr } from '../lib/i18n'
 import type {
   Deltakertype,
   Kamp,
@@ -8,33 +9,33 @@ import type {
   Turneringstype,
 } from './types'
 
-export const TYPE_NAVN: Record<Turneringstype, string> = {
+export const TYPE_NAVN: Record<Turneringstype, string> = oversatt({
   CUP: 'Cup',
   LIGA: 'Liga',
   ALLE_MOT_ALLE: 'Alle mot alle',
   SVEITSISK: 'Swiss stage',
-}
+})
 
-export const TYPE_BESKRIVELSE: Record<Turneringstype, string> = {
+export const TYPE_BESKRIVELSE: Record<Turneringstype, string> = oversatt({
   CUP: 'Utslagsturnering med brakett.',
   LIGA: 'Sesong der alle møter alle to ganger, over flere uker.',
   ALLE_MOT_ALLE: 'Alle møter alle én gang, vanligvis på én dag.',
   SVEITSISK: 'Like gode møtes hver runde. Passer for e-sport og sjakk.',
-}
+})
 
-export const DELTAKERTYPE_NAVN: Record<Deltakertype, string> = {
+export const DELTAKERTYPE_NAVN: Record<Deltakertype, string> = oversatt({
   LAG: 'Lag',
   SPILLER: '1 mot 1',
-}
+})
 
-export const STATUS_NAVN: Record<Status, string> = {
+export const STATUS_NAVN: Record<Status, string> = oversatt({
   KOMMER: 'Kommer',
   PAMELDING_APEN: 'Påmelding åpen',
   PAGAR: 'Pågår',
   AVSLUTTET: 'Avsluttet',
-}
+})
 
-export const KOLONNE_NAVN: Record<KolonneId, string> = {
+export const KOLONNE_NAVN: Record<KolonneId, string> = oversatt({
   S: 'K',
   V: 'S',
   U: 'U',
@@ -44,9 +45,9 @@ export const KOLONNE_NAVN: Record<KolonneId, string> = {
   P: 'P',
   SB: 'SB',
   BH: 'BH',
-}
+})
 
-export const KOLONNE_TITTEL: Record<KolonneId, string> = {
+export const KOLONNE_TITTEL: Record<KolonneId, string> = oversatt({
   S: 'Kamper',
   V: 'Seier',
   U: 'Uavgjort',
@@ -56,7 +57,7 @@ export const KOLONNE_TITTEL: Record<KolonneId, string> = {
   P: 'Poeng',
   SB: 'Sonneborn-Berger',
   BH: 'Buchholz',
-}
+})
 
 /** Tall til visning. Sjakk viser ½. */
 export function tallTekst(v: number): string {
@@ -78,7 +79,7 @@ export function visResultat(k: Kamp, profil: Spillprofil): string {
 export function avgjoringTekst(k: Kamp): string | undefined {
   if (k.walkover) return 'w.o.'
   if (k.avgjoring?.metode === 'STRAFFER') return `${k.avgjoring.A}–${k.avgjoring.B} e.str.`
-  if (k.avgjoring?.metode === 'ARMAGEDDON') return 'Armageddon'
+  if (k.avgjoring?.metode === 'ARMAGEDDON') return tr('Armageddon')
   return undefined
 }
 
@@ -88,8 +89,8 @@ export function sideNavn(profil: Spillprofil, side: Side): string {
 
 export function rundeNavn(runde: number, antallRunder: number): string {
   const fraSlutt = antallRunder - runde
-  if (fraSlutt === 0) return 'Finale'
-  if (fraSlutt === 1) return 'Semifinale'
-  if (fraSlutt === 2) return 'Kvartfinale'
-  return `Runde ${runde}`
+  if (fraSlutt === 0) return tr('Finale')
+  if (fraSlutt === 1) return tr('Semifinale')
+  if (fraSlutt === 2) return tr('Kvartfinale')
+  return `${tr('Runde')} ${runde}`
 }

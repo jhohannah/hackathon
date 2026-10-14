@@ -1,6 +1,7 @@
 import { avgjoringTekst, visResultat } from '../core/format'
 import type { Kamp, Spillprofil } from '../core/types'
 import { klokkeslett } from '../lib/tid'
+import { tr } from '../lib/i18n'
 
 interface Props {
   kamp: Kamp
@@ -17,7 +18,7 @@ export function KampRad({ kamp, navn, profil, onVelg, turneringsnavn }: Props) {
       <div className="kamp-rad">
         <span className="tid">Runde {kamp.runde}</span>
         <span className="lag-a">{navn(kamp.deltakerAId)}</span>
-        <span className="score smaa">bye</span>
+        <span className="score smaa">{tr('bye')}</span>
         <span className="lag-b sek">{kamp.vinnerId ? 'Frirunde (teller som seier)' : 'Frirunde'}</span>
         <span />
       </div>
@@ -42,7 +43,7 @@ export function KampRad({ kamp, navn, profil, onVelg, turneringsnavn }: Props) {
       </span>
       <span className={`lag-a ${aVant ? 'vant' : bVant ? 'tapt' : ''}`}>
         {navn(kamp.deltakerAId)}
-        {sider && <div className="smaa">{profil.sideNavn.A}</div>}
+        {sider && <div className="smaa">{tr(profil.sideNavn.A)}</div>}
       </span>
       <span className="score">
         {ferdig ? visResultat(kamp, profil) : 'vs'}
@@ -50,17 +51,17 @@ export function KampRad({ kamp, navn, profil, onVelg, turneringsnavn }: Props) {
       </span>
       <span className={`lag-b ${bVant ? 'vant' : aVant ? 'tapt' : ''}`}>
         {navn(kamp.deltakerBId)}
-        {sider && <div className="smaa">{profil.sideNavn.B}</div>}
+        {sider && <div className="smaa">{tr(profil.sideNavn.B)}</div>}
       </span>
       <span className="status">
         {kamp.status === 'PAGAR' && (
           <span className="merke pagar">
             <span className="live-prikk" />
-            Pågår
+            {tr('Pågår')}
           </span>
         )}
         {ferdig && kamp.walkover && <span className="merke wo">w.o.</span>}
-        {klikkbar && !ferdig && kamp.status !== 'PAGAR' && <span className="merke lilla">Registrer</span>}
+        {klikkbar && !ferdig && kamp.status !== 'PAGAR' && <span className="merke lilla">{tr('Registrer')}</span>}
       </span>
     </Tag>
   )

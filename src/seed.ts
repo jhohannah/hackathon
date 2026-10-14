@@ -1,4 +1,4 @@
-import { hentProfil } from './core/profiler'
+import { hentProfil, profilFor } from './core/profiler'
 import { genererCup, seedDeltakere } from './core/generatorer/cup'
 import { genererLiga, genererRoundRobin } from './core/generatorer/rundeturnering'
 import { lagRng } from './core/generatorer/rng'
@@ -62,7 +62,7 @@ export function lagSeed(now: Date = new Date()): Data {
 
   /** Spiller en kamp med simulert resultat (eller et gitt resultat). */
   function spill(t: Turnering, d: Deltaker[], k: Kamp, input?: ResultatInput, utenRemis = false) {
-    const profil = hentProfil(t.spillprofilId)
+    const profil = profilFor(t)
     const opts = { kreverVinner: kreverVinner(t), bestOf: t.bestOf }
     let resultat =
       input ?? simulerResultat(k, ratingAv(d, k.deltakerAId), ratingAv(d, k.deltakerBId), profil, opts, rng)
@@ -84,7 +84,7 @@ export function lagSeed(now: Date = new Date()): Data {
     kamper.push(...nye)
   }
   const ferdigstill = (t: Turnering, d: Deltaker[]) => {
-    const profil = hentProfil(t.spillprofilId)
+    const profil = profilFor(t)
     t.status = beregnStatus(t, kamper.filter((k) => k.turneringId === t.id), d, profil)
   }
 

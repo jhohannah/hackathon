@@ -2,6 +2,7 @@ import { KOLONNE_NAVN, KOLONNE_TITTEL, tallTekst } from '../core/format'
 import { effektivPoeng, tabellkolonner } from '../core/regler/tabell'
 import type { KolonneId, Tabellrad } from '../core/types'
 import type { TurneringData } from '../lib/hooks'
+import { tr } from '../lib/i18n'
 
 function celle(kol: KolonneId, r: Tabellrad) {
   switch (kol) {
@@ -67,7 +68,7 @@ export function Tabell({ data }: { data: TurneringData }) {
         </table>
       </div>
       <div className="liten" style={{ padding: '10px 14px', borderTop: '1px solid var(--kant)' }}>
-        Poengsystem: Seier {tallTekst(p.seier)} · Uavgjort {tallTekst(p.uavgjort)} · Tap {tallTekst(p.tap)}
+        {tr('Poengsystem')}: {tr('Seier')} {tallTekst(p.seier)} · {tr('Uavgjort')} {tallTekst(p.uavgjort)} · {tr('Tap')} {tallTekst(p.tap)}
         {turnering.poengOverstyring && ' (tilpasset)'}
       </div>
     </div>
