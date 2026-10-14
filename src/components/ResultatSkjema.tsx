@@ -190,19 +190,19 @@ export function ResultatSkjema({
       <div className="skille" />
       {!visForfall ? (
         <button className="knapp sek-knapp liten-knapp" onClick={() => setVisForfall(true)}>
-          Forfall (walkover)
+          Møtte ikke opp (walkover)
         </button>
       ) : (
         <div>
           <div className="liten" style={{ marginBottom: 6 }}>
-            Den som møtte får seieren ({format === 'KART' ? `${vinn}–0` : `${profil.walkoverResultat.vinner}–${profil.walkoverResultat.taper}`}) og poengene.
+            Den som møtte opp får seieren ({format === 'KART' ? `${vinn}–0` : `${profil.walkoverResultat.vinner}–${profil.walkoverResultat.taper}`}) og full poengsum, som om de hadde vunnet.
           </div>
           <div className="stabel" style={{ display: 'grid', gap: 8 }}>
             <button className="knapp sek-knapp" onClick={() => forfall('B')}>
-              {nA_navn} møtte ikke
+              {nA_navn} møtte ikke opp
             </button>
             <button className="knapp sek-knapp" onClick={() => forfall('A')}>
-              {nB_navn} møtte ikke
+              {nB_navn} møtte ikke opp
             </button>
             {!krever && (
               <button className="knapp fare" onClick={() => forfall('INGEN')}>

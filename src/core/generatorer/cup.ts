@@ -24,15 +24,24 @@ export function seedRekkefolge(storrelse: number): number[] {
   return o
 }
 
+/**
+ * Seedingrekkefølge: beste først. Med rating sorteres etter den (like ratinger loddes med seedet RNG),
+ * uten rating er seedingen tilfeldig. Samme funksjon brukes av generatoren og av appen for å vise seed.
+ */
+export function seedDeltakere(
+  ids: string[],
+  opts: { seed?: number; rating?: Record<string, number> },
+): string[] {
+  const rng = lagRng(opts.seed ?? 1)
+  const sortert = bland(ids, rng)
+  const r = opts.rating
+  return r ? [...sortert].sort((a, b) => (r[b] ?? 0) - (r[a] ?? 0)) : sortert
+}
+
 export function genererCup(deltakerIds: string[], opts: CupOpts): Kamp[] {
   const n = deltakerIds.length
   if (n < 2) return []
-  const rng = lagRng(opts.seed ?? 1)
-  let sortert = bland(deltakerIds, rng)
-  if (opts.rating) {
-    const r = opts.rating
-    sortert = [...sortert].sort((a, b) => (r[b] ?? 0) - (r[a] ?? 0))
-  }
+  const sortert = seedDeltakere(deltakerIds, opts)
 
   let storrelse = 1
   while (storrelse < n) storrelse *= 2

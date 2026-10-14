@@ -1,5 +1,5 @@
 import { hentProfil } from './core/profiler'
-import { genererCup } from './core/generatorer/cup'
+import { genererCup, seedDeltakere } from './core/generatorer/cup'
 import { genererLiga, genererRoundRobin } from './core/generatorer/rundeturnering'
 import { lagRng } from './core/generatorer/rng'
 import { registrerResultat, registrerWalkover } from './core/regler/resultat'
@@ -116,6 +116,9 @@ export function lagSeed(now: Date = new Date()): Data {
       rating,
       tidspunkt: (r, i) =>
         (r === 1 ? min(iDag(now, 18), -24 * 60 + i * 60) : r === 2 ? iDag(now, 14, i * 60) : iDag(now, 18)).toISOString(),
+    })
+    seedDeltakere(d.map((x) => x.id), { seed: 4, rating }).forEach((did, i) => {
+      d.find((x) => x.id === did)!.seed = i + 1
     })
     leggTil(t, d, kk)
     // Kvartfinale 2 ender remis → armageddon.
@@ -290,6 +293,9 @@ export function lagSeed(now: Date = new Date()): Data {
       seed: 9,
       rating,
       dagerMellomRunder: 3,
+    })
+    seedDeltakere(d.map((x) => x.id), { seed: 9, rating }).forEach((did, i) => {
+      d.find((x) => x.id === did)!.seed = i + 1
     })
     leggTil(t, d, kk)
     for (let r = 1; r <= 3; r++) {

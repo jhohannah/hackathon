@@ -73,7 +73,7 @@ export interface Turnering {
   bestOf?: number
   lagstorrelse?: number
   poengOverstyring?: Poeng
-  seeding?: 'RATING' | 'TILFELDIG'
+  seeding?: 'RATING' | 'TILFELDIG' | 'MANUELL'
   sveitsisk?: SveitsiskInnstillinger
   oppdatert: number
 }
@@ -84,6 +84,8 @@ export interface Deltaker {
   type: Deltakertype
   visningsnavn: string
   rating?: number
+  /** Seed i cup (1 = best). Settes når braketten genereres. */
+  seed?: number
   kaptein?: string
   spillere?: string[]
   epost?: string
